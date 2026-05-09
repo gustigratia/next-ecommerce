@@ -38,7 +38,7 @@ const Page = ({ searchParams }) => {
         // Fetch product data based on the search parameters and current page
         const fetchInitialData = async () => {
             try {
-                const response = await axios.get(`${process.env.API_URL}/api/product?${searchQuery}`);
+                const response = await axios.get(`/api/product?${searchQuery}`);
                 setProductData(response.data);
             } catch (error) {
                 console.error('Error fetching product data:', error);

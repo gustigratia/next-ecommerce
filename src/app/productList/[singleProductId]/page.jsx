@@ -6,23 +6,28 @@
  * @param {Object} params - Route parameters, including 'singleProductId' for the specific product.
  * @returns {JSX.Element} - Rendered component displaying the single product details and similar items.
  */
-import axios from "axios"
-import SingleProductDetail from '@/app/clientComponent/SingleProductDetail'
-import SimilarItems from '@/app/clientComponent/SimilarItems'
+import axios from "axios";
+import SingleProductDetail from "@/app/clientComponent/SingleProductDetail";
+import SimilarItems from "@/app/clientComponent/SimilarItems";
 
 const singleProduct = async ({ params }) => {
-    // Fetch details of the specific product using the provided product ID
-    const { data } = await axios.get(`${process.env.API_URL}/api/product/${params.singleProductId}`)
-    // Fetch all product data to find similar items in the same category
-    const productData = await axios.get(`${process.env.API_URL}/api/product`);
-    // Render the SingleProductDetail component for the selected product and SimilarItems for related products
-    return (
-        <div>
-            <SingleProductDetail singleProductData={data.singleProductDetail} />
-            <SimilarItems allProductData={productData.data.products} productCateogary={data.singleProductDetail.category} />
-        </div>
-    )
-}
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-export default singleProduct
+  const { data } = await axios.get(
+    `${baseUrl}/api/product/${params.singleProductId}`
+  );
 
+  const productData = await axios.get(`${baseUrl}/api/product`);
+
+  return (
+    <div>
+      <SingleProductDetail singleProductData={data.singleProductDetail} />
+      <SimilarItems
+        allProductData={productData.data.products}
+        productCateogary={data.singleProductDetail.category}
+      />
+    </div>
+  );
+};
+
+export default singleProduct;
