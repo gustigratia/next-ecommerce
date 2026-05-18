@@ -51,9 +51,12 @@
 
 - i have to work more on this application
 
-## Authors
+## Original Project Credit
 
-- [@Divya Gauav]( https://divyagaurav.netlify.app/ )
+This project was originally created by:
+
+[@Divya Gaurav]( https://divyagaurav.netlify.app/ )
+
+The repository has been forked and is being further developed by the current maintainer.
 
 
-# Hi, I'm Divya gaurav👋 Next js Developer.
