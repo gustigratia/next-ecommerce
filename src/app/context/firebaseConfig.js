@@ -1,24 +1,21 @@
-
-//----FIREBASE CONFIGURATION FOR USER AUTHENTICATION----//
-
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-// import { getAnalytics } from "firebase/analytics";
+import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "AIzaSyBRwSKiy3tiQhBbXfHaL7-ZNxGj7sU-FQ4",
-    authDomain: "ecommerce-ipsator.firebaseapp.com",
-    projectId: "ecommerce-ipsator",
-    storageBucket: "ecommerce-ipsator.appspot.com",
-    messagingSenderId: "1091662411953",
-    appId: "1:1091662411953:web:6d39066f90913678098a90",
-    measurementId: "G-11F9WBH0HC"
+  apiKey: "AIzaSyDU3R9sJiNuZiD8yBu7FIg1lfy9kg3zRUc",
+  authDomain: "next-commerce-9e142.firebaseapp.com",
+  projectId: "next-commerce-9e142",
+  storageBucket: "next-commerce-9e142.firebasestorage.app",
+  messagingSenderId: "321128604938",
+  appId: "1:321128604938:web:b69156629eb50c93d146f3",
+  measurementId: "G-YPE4RJ578W"
 };
 
 // Initialize Firebase
-export const firebaseApp = initializeApp(firebaseConfig);
-// const analytics = getAnalytics(firebaseApp);
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);

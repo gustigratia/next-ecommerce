@@ -23,53 +23,40 @@ const productSchema = new mongoose.Schema({
             },
         },
     ],
-
     category: {
         type: String,
         required: [true, "Please enter product category"],
         enum: {
             values: [
-                "Electronics",
-                "Cameras",
-                "Laptops",
-                "Accessories",
-                "Headphones",
-                "Sports",
+                "Electronics", "Cameras", "Laptops", "Accessories", "Headphones", "Sports",
             ],
             message: "Please select correct category",
         },
     },
     seller: {
-        type: String,
-        required: [true, "Please enter product seller"],
+        type: String, required: [true, "Please enter product seller"],
     },
     stock: {
-        type: Number,
-        required: [true, "Please enter product stock"],
+        type: Number, required: [true, "Please enter product stock"],
     },
     ratings: {
-        type: Number,
-        default: 0,
+        type: Number, default: 0,
     },
     reviews: [
         {
             rating: {
-                type: Number,
-                required: true,
+                type: Number, required: true,
             },
             comment: {
-                type: String,
-                required: true,
+                type: String, required: true,
             },
             createdAt: {
-                type: Date,
-                default: Date.now,
+                type: Date, default: Date.now,
             },
         },
     ],
     createdAt: {
-        type: Date,
-        default: Date.now,
+        type: Date, default: Date.now,
     },
 });
 
