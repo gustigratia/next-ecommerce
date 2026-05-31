@@ -16,8 +16,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${poppins.className} text-slate-700`}>
-        <CartProvider>
-          <FirebaseContextProvider>
+        <FirebaseContextProvider>
+          <CartProvider>
             <div className='flex flex-col min-h-screen'>
               <NavBar />
               <main className='flex-grow'>
@@ -25,8 +25,9 @@ export default function RootLayout({ children }) {
               </main>
               <Footer />
             </div>
-          </FirebaseContextProvider>
-        </CartProvider>
+          </CartProvider>
+        </FirebaseContextProvider>
+
         <script src="https://kit.fontawesome.com/83b993c0e4.js"></script>
       </body>
     </html>
