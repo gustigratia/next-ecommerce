@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    output: "standalone",
     env: {
         // DB_URI: "mongodb+srv://divyagaurav1602045:PwR2GUxnJWMJo7vS@cluster0.g6en0r5.mongodb.net/?retryWrites=true&w=majority",
         DB_URI: "mongodb+srv://gustigratia:delpiera06@cluster0.kuaeyei.mongodb.net/ecommerce?appName=Cluster0",
