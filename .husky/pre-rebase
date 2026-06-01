@@ -1,1 +1,1 @@
-echo "[husky] pre-rebase hook"
+node -e "const s=require('./package.json').scripts||{};process.exit(s.lint?0:1)" && npm run -s lint
