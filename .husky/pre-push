@@ -1,1 +1,2 @@
-echo "[husky] pre-push hook"
+node -e "const s=require('./package.json').scripts||{};process.exit(s.test?0:1)" && npm run -s test
+node -e "const s=require('./package.json').scripts||{};process.exit(s.build?0:1)" && npm run -s build
