@@ -1,63 +1,76 @@
-name: CD - Build and Deploy to Vercel
+name: CD - Build and Deploy to GCP
 
 on:
-  push:
-    branches: [master]
+  workflow_run:
+    workflows: ["CI - Lint and Test"]
+    types:
+      - completed
+    branches:
+      - master
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: asia-southeast2
+  REPOSITORY: next-ecommerce-repo
+  IMAGE_NAME: next-ecommerce
+  SERVICE_NAME: next-ecommerce
 
 jobs:
   build-and-deploy:
-    name: Build, Lint, and Deploy
+    name: Build and Deploy to Cloud Run
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       # ─── 1. Checkout Source Code ─────────────────────────────────────────
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ─── 2. Setup Node.js ────────────────────────────────────────────────
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      # ─── 2. Authenticate to Google Cloud ─────────────────────────────────
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          node-version: "20"
-          cache: "npm"
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
-      # ─── 3. Install Dependencies ─────────────────────────────────────────
-      - name: Install dependencies
-        run: npm ci
+      # ─── 3. Setup Google Cloud SDK ───────────────────────────────────────
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
 
-      # ─── 4. Lint Check ───────────────────────────────────────────────────
-      - name: Lint with ESLint
-        run: npm run lint
+      # ─── 4. Configure Docker for Artifact Registry ──────────────────────
+      - name: Configure Docker authentication
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
 
-      # ─── 5. Build Project ────────────────────────────────────────────────
-      # Dummy env vars for build-time (not used in production).
-      # Real values are managed via Vercel Environment Variables settings.
-      - name: Build project
-        run: npm run build
-        env:
-          # MongoDB
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+      # ─── 5. Build Docker Image ───────────────────────────────────────────
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:latest \
+            .
 
-          # Firebase (Public keys — safe for NEXT_PUBLIC_)
-          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
-          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
-          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
-          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
-          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
-          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+      # ─── 6. Push Docker Image to Artifact Registry ───────────────────────
+      - name: Push Docker image
+        run: |
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:latest
 
-      # ─── 6. Install Vercel CLI ───────────────────────────────────────────
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
+      # ─── 7. Deploy to Cloud Run ──────────────────────────────────────────
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.REGION }}
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          flags: --allow-unauthenticated
 
-      # ─── 7. Pull Vercel Environment & Project Info ───────────────────────
-      - name: Pull Vercel environment information
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-
-      # ─── 8. Build via Vercel (generates .vercel/output) ─────────────────
-      - name: Build project artifacts (Vercel)
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      # ─── 9. Deploy to Vercel Production ─────────────────────────────────
-      - name: Deploy to Vercel Production
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+      # ─── 8. Show Cloud Run URL ───────────────────────────────────────────
+      - name: Show service URL
+        run: |
+          gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region ${{ env.REGION }} \
+            --format="value(status.url)"

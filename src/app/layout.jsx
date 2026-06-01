@@ -4,6 +4,7 @@ import NavBar from './components/nav/NavBar'
 import Footer from './components/footer/Footer'
 import FirebaseContextProvider from './context/FirebaseContext'
 import { CartProvider } from './context/CartContext'
+import Script from 'next/script'
 
 const poppins = Poppins({ subsets: ['latin'], weight: ["400", "700"] })
 
@@ -28,7 +29,10 @@ export default function RootLayout({ children }) {
           </CartProvider>
         </FirebaseContextProvider>
 
-        <script src="https://kit.fontawesome.com/83b993c0e4.js"></script>
+        <Script
+          src="https://kit.fontawesome.com/83b993c0e4.js"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   )
