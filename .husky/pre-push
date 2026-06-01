@@ -1,1 +1,6 @@
-echo "[husky] pre-push hook"
+if node -e "const s=require('./package.json').scripts||{};process.exit(s.test?0:1)"; then
+	npm run -s test
+fi
+if node -e "const s=require('./package.json').scripts||{};const hasFirebase=!!process.env.NEXT_PUBLIC_FIREBASE_API_KEY;process.exit(s.build && hasFirebase?0:1)"; then
+	npm run -s build
+fi
