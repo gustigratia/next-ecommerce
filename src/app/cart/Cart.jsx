@@ -62,7 +62,7 @@ const Cart = () => {
                                 <article className="border border-gray-200 bg-white shadow-sm rounded mb-5 p-3 lg:p-5">
                                     {/* Map through each cart item and display details */}
                                     {cart?.cartItems?.map((cartItem) => (
-                                        <div>
+                                        <div key={cartItem.product}>
                                             <div className="flex flex-wrap lg:flex-row gap-5  mb-4">
                                                 {/* Product image and details */}
                                                 <div className="w-full lg:w-2/5 xl:w-2/4">

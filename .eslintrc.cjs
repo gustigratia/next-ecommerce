@@ -1,7 +1,3 @@
-// .eslintrc.cjs
-// Konfigurasi ini digunakan oleh `next lint` (Next.js 13 built-in ESLint v8).
-// Bersifat komplementer dengan eslint.config.js untuk kompatibilitas penuh.
-
 module.exports = {
   extends: [
     "next",                  // Next.js core rules

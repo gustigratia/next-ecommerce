@@ -14,7 +14,7 @@ const BreadCrumbs = ({ breadCrumbs }) => {
                 {/* Breadcrumb navigation list */}
                 <ol className="inline-flex flex-wrap text-yellow-400 space-x-1 md:space-x-3 items-center font-bold">
                     {breadCrumbs?.map((breadCrumb, index) => (
-                        <li className="inline-flex items-center">
+                        <li key={breadCrumb.url || index} className="inline-flex items-center">
                             {/* Breadcrumb link */}
                             <Link
                                 href={breadCrumb.url}
