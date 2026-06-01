@@ -11,7 +11,7 @@ on:
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: asia-southeast2
-  REPOSITORY: next-ecommerce-repo
+  REPOSITORY: next-ecommerce-artifact
   IMAGE_NAME: next-ecommerce
   SERVICE_NAME: next-ecommerce
 
