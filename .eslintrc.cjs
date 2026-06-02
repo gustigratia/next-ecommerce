@@ -1,7 +1,7 @@
 module.exports = {
   extends: [
-    "next",                  // Next.js core rules
-    "next/core-web-vitals",  // Strict rules for performance (LCP, CLS, etc.)
+    "next",                  
+    "next/core-web-vitals",  
   ],
   parserOptions: {
     ecmaVersion: 2024,
@@ -11,13 +11,10 @@ module.exports = {
     },
   },
   rules: {
-    // ─── Next.js / React Rules ──────────────────────────────────────────────
-    "react/react-in-jsx-scope": "off",   // Next.js auto-imports React
+    "react/react-in-jsx-scope": "off",   
     "react/prop-types": "off",
     "react/no-unescaped-entities": "warn",
     "react/jsx-key": "error",
-
-    // ─── Code Quality ───────────────────────────────────────────────────────
     "no-unused-vars": [
       "warn",
       {

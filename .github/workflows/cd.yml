@@ -27,25 +27,20 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      # ─── 1. Checkout Source Code ─────────────────────────────────────────
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ─── 2. Authenticate to Google Cloud ─────────────────────────────────
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-      # ─── 3. Setup Google Cloud SDK ───────────────────────────────────────
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      # ─── 4. Configure Docker for Artifact Registry ──────────────────────
       - name: Configure Docker authentication
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
 
-      # ─── 5. Build Docker Image ───────────────────────────────────────────
       - name: Build Docker image
         run: |
           docker build \
@@ -59,13 +54,11 @@ jobs:
             -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:latest \
             .
 
-      # ─── 6. Push Docker Image to Artifact Registry ───────────────────────
       - name: Push Docker image
         run: |
           docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:latest
 
-      # ─── 7. Deploy to Cloud Run ──────────────────────────────────────────
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
@@ -73,8 +66,7 @@ jobs:
           region: ${{ env.REGION }}
           image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           flags: --allow-unauthenticated
-
-      # ─── 8. Show Cloud Run URL ───────────────────────────────────────────
+          
       - name: Show service URL
         run: |
           gcloud run services describe ${{ env.SERVICE_NAME }} \
