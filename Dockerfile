@@ -12,7 +12,6 @@ RUN npm install -g npm@11.6.2
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Accept Firebase env vars at build time
 ARG NEXT_PUBLIC_FIREBASE_API_KEY
 ARG NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
 ARG NEXT_PUBLIC_FIREBASE_PROJECT_ID
