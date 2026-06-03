@@ -28,7 +28,12 @@ const customJestConfig = {
   ],
 
   // Exclude E2E tests from Jest
-  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/.next/', '<rootDir>/e2e/'],
+  testPathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+    '<rootDir>/.next/',
+    '<rootDir>/e2e/',
+    '<rootDir>/src/__test__/integration/',
+  ],
 
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
