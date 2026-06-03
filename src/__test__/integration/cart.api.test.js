@@ -8,21 +8,46 @@ import { createMocks } from 'node-mocks-http';
 
 import Cart from '@/models/Cart';
 
-jest.mock('@/lib/mongodb', () => ({ connectDB: jest.fn() }));
-jest.mock('@/lib/firebaseAdmin', () => ({
-  verifyIdToken: jest.fn().mockResolvedValue({ uid: 'user_abc', email: 'test@test.com' }),
-}));
+jest.mock(
+  '@/lib/mongodb',
+  () => ({
+    connectDB: jest.fn(),
+  }),
+  { virtual: true }
+);
+
+jest.mock(
+  '@/lib/firebaseAdmin',
+  () => ({
+    verifyIdToken: jest.fn().mockResolvedValue({
+      uid: 'user_abc',
+      email: 'test@test.com',
+    }),
+  }),
+  { virtual: true }
+);
+
+jest.mock(
+  '@/models/Cart',
+  () => ({
+    findOne: jest.fn(),
+    create: jest.fn(),
+  }),
+  { virtual: true }
+);
 
 const mockCart = {
   userId: 'user_abc',
-  items: [{ productId: 'prod_1', quantity: 2, price: 99.99, title: 'Classic Sneakers' }],
+  items: [
+    {
+      productId: 'prod_1',
+      quantity: 2,
+      price: 99.99,
+      title: 'Classic Sneakers',
+    },
+  ],
   save: jest.fn().mockResolvedValue(true),
 };
-
-jest.mock('@/models/Cart', () => ({
-  findOne: jest.fn(),
-  create: jest.fn(),
-}));
 
 describe('GET /api/cart', () => {
   let handler;
@@ -41,6 +66,7 @@ describe('GET /api/cart', () => {
       method: 'GET',
       headers: { authorization: 'Bearer valid_token' },
     });
+
     const res = await handler(req);
     const body = await res.json();
 
@@ -49,12 +75,16 @@ describe('GET /api/cart', () => {
   });
 
   it('returns 401 when no auth token is provided', async () => {
-    const { req } = createMocks({ method: 'GET', headers: {} });
-    // Mock verifyIdToken to throw for missing token
+    const { req } = createMocks({
+      method: 'GET',
+      headers: {},
+    });
+
     const { verifyIdToken } = await import('@/lib/firebaseAdmin');
     verifyIdToken.mockRejectedValueOnce(new Error('No token'));
 
     const res = await handler(req);
+
     expect(res.status).toBe(401);
   });
 });
@@ -74,13 +104,23 @@ describe('POST /api/cart', () => {
       ...mockCart,
       items: [...mockCart.items, { productId: 'prod_2', quantity: 1 }],
     };
-    Cart.findOne.mockResolvedValue({ ...mockCart, save: jest.fn().mockResolvedValue(updatedCart) });
+
+    Cart.findOne.mockResolvedValue({
+      ...mockCart,
+      save: jest.fn().mockResolvedValue(updatedCart),
+    });
 
     const { req } = createMocks({
       method: 'POST',
       headers: { authorization: 'Bearer valid_token' },
-      body: { productId: 'prod_2', quantity: 1, price: 129.99, title: 'Running Shoes' },
+      body: {
+        productId: 'prod_2',
+        quantity: 1,
+        price: 129.99,
+        title: 'Running Shoes',
+      },
     });
+
     const res = await handler(req);
 
     expect(res.status).toBe(200);
@@ -96,8 +136,14 @@ describe('POST /api/cart', () => {
     const { req } = createMocks({
       method: 'POST',
       headers: { authorization: 'Bearer valid_token' },
-      body: { productId: 'prod_1', quantity: 1, price: 99.99, title: 'Classic Sneakers' },
+      body: {
+        productId: 'prod_1',
+        quantity: 1,
+        price: 99.99,
+        title: 'Classic Sneakers',
+      },
     });
+
     const res = await handler(req);
 
     expect(Cart.create).toHaveBeenCalled();
