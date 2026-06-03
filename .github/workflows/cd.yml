@@ -2,7 +2,7 @@ name: CD - Build and Deploy to GCP
 
 on:
   workflow_run:
-    workflows: ["CI - Lint and Test"]
+    workflows: ['CI - Lint and Test']
     types:
       - completed
     branches:
@@ -66,7 +66,7 @@ jobs:
           region: ${{ env.REGION }}
           image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           flags: --allow-unauthenticated
-          
+
       - name: Show service URL
         run: |
           gcloud run services describe ${{ env.SERVICE_NAME }} \

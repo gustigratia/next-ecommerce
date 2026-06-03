@@ -1,35 +1,35 @@
-.loginPage{
-    @apply flex flex-wrap content-center justify-center rounded-xl bg-yellow-100 w-full h-full px-7 text-slate-700;
+.loginPage {
+  @apply flex flex-wrap content-center justify-center rounded-xl bg-yellow-100 w-full h-full px-7 text-slate-700;
 }
-.loginPage h1{
-  @apply text-xl font-semibold text-center;  
+.loginPage h1 {
+  @apply text-xl font-semibold text-center;
 }
-.loginPage h4{
-    @apply text-gray-400 text-center;
+.loginPage h4 {
+  @apply text-gray-400 text-center;
 }
-.label{
-    @apply mb-3 block text-xs font-semibold;
+.label {
+  @apply mb-3 block text-xs font-semibold;
 }
-.label2{
-    @apply block text-xs font-semibold;
+.label2 {
+  @apply block text-xs font-semibold;
 }
-.inputfield{
-    @apply block w-full rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-1 px-1.5 text-gray-500;
-}
-
-.eye{
-    @apply px-1 absolute top-[28px] right-0 cursor-pointer text-2xl;
+.inputfield {
+  @apply block w-full rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-1 px-1.5 text-gray-500;
 }
 
-.authbtn{
-    @apply mb-2 flex flex-wrap justify-center w-full border border-gray-300 hover:border-gray-500 px-2 py-1.5 rounded-md text-black;
+.eye {
+  @apply px-1 absolute top-[28px] right-0 cursor-pointer text-2xl;
 }
-.signinbtn{
-    @apply mb-2 block w-full text-center text-white bg-red-700 hover:bg-red-900 px-2 py-1.5 rounded-md;
+
+.authbtn {
+  @apply mb-2 flex flex-wrap justify-center w-full border border-gray-300 hover:border-gray-500 px-2 py-1.5 rounded-md text-black;
 }
-.forget{
-    @apply text-xs font-semibold text-purple-700 ml-3;
+.signinbtn {
+  @apply mb-2 block w-full text-center text-white bg-red-700 hover:bg-red-900 px-2 py-1.5 rounded-md;
 }
-.iconimg{
-    @apply w-5 mr-2;
+.forget {
+  @apply text-xs font-semibold text-purple-700 ml-3;
+}
+.iconimg {
+  @apply w-5 mr-2;
 }

@@ -22,18 +22,23 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", 
-              ".next/types/**/*.ts", "src/app/api/product/route.js", 
-              "src/app/productList/ProductList.jsx",
-              "src/app/clientComponent/SingleProductDetail.jsx", 
-              "src/app/productList/page.jsx", 
-              "src/app/components/nav/Search.jsx", 
-              "src/app/components/nav/NavBar.jsx", 
-              "src/app/components/Container.jsx", 
-              "src/app/page.jsx", 
-              "src/app/layout.jsx", 
-              "src/app/productList/[singleProductId]/page.jsx", 
-              "src/app/api/product/[singleProductId]/route.js", 
-              "src/app/components/footer/Footer.jsx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src/app/api/product/route.js",
+    "src/app/productList/ProductList.jsx",
+    "src/app/clientComponent/SingleProductDetail.jsx",
+    "src/app/productList/page.jsx",
+    "src/app/components/nav/Search.jsx",
+    "src/app/components/nav/NavBar.jsx",
+    "src/app/components/Container.jsx",
+    "src/app/page.jsx",
+    "src/app/layout.jsx",
+    "src/app/productList/[singleProductId]/page.jsx",
+    "src/app/api/product/[singleProductId]/route.js",
+    "src/app/components/footer/Footer.jsx"
+  ],
   "exclude": ["node_modules"]
 }
