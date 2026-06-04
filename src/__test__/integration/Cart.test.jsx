@@ -1,85 +1,140 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-const mockRemoveFromCart = jest.fn();
-const mockUpdateQuantity = jest.fn();
-const mockClearCart = jest.fn();
+import CartPage from '@/app/cart/Cart';
+import CartContext from '@/app/context/CartContext';
 
-const cartItems = [
-  { _id: 'prod_1', title: 'Classic Sneakers', price: 99.99, quantity: 2, image: '/sneakers.jpg' },
-  { _id: 'prod_2', title: 'Running Shoes', price: 129.99, quantity: 1, image: '/running.jpg' },
-];
+const mockAddItemToCart = jest.fn();
+const mockDeleteItemFromCart = jest.fn();
 
-jest.mock('@/context/CartContext', () => ({
-  useCart: () => ({
-    cart: cartItems,
-    removeFromCart: mockRemoveFromCart,
-    updateQuantity: mockUpdateQuantity,
-    clearCart: mockClearCart,
-    totalPrice: 329.97,
-  }),
+jest.mock('@/app/context/FirebaseContext', () => ({
+  __esModule: true,
+  useFirebaseAppContext: jest.fn(() => ({
+    user: { uid: 'test-user' },
+    loading: false,
+  })),
 }));
 
-let CartPage;
-beforeAll(async () => {
-  const mod = await import('@/components/Cart');
-  CartPage = mod.default;
+jest.mock('next/link', () => {
+  return function MockLink({ href, children, ...props }) {
+    return (
+      <a href={typeof href === 'string' ? href : '#'} {...props}>
+        {children}
+      </a>
+    );
+  };
 });
 
+const cartItems = [
+  {
+    product: 'prod_1',
+    name: 'Classic Sneakers',
+    price: 99.99,
+    quantity: 2,
+    image: '/sneakers.jpg',
+    stock: 20,
+    seller: 'Nike',
+  },
+  {
+    product: 'prod_2',
+    name: 'Running Shoes',
+    price: 129.99,
+    quantity: 1,
+    image: '/running.jpg',
+    stock: 15,
+    seller: 'Adidas',
+  },
+];
+
+function renderCart(customItems = cartItems) {
+  return render(
+    <CartContext.Provider
+      value={{
+        cart: {
+          cartItems: customItems,
+        },
+        addItemToCart: mockAddItemToCart,
+        deleteItemFromCart: mockDeleteItemFromCart,
+      }}
+    >
+      <CartPage />
+    </CartContext.Provider>
+  );
+}
+
 describe('Cart component', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   it('renders all cart items', () => {
-    render(<CartPage />);
+    renderCart();
 
     expect(screen.getByText('Classic Sneakers')).toBeInTheDocument();
     expect(screen.getByText('Running Shoes')).toBeInTheDocument();
   });
 
-  it('shows the correct total price', () => {
-    render(<CartPage />);
+  it('shows the correct cart summary', () => {
+    renderCart();
+
+    expect(screen.getByText(/2 Item\(s\) in Cart/i)).toBeInTheDocument();
+    expect(screen.getByText(/Amount before Tax:/i)).toBeInTheDocument();
     expect(screen.getByText(/329\.97/)).toBeInTheDocument();
+    expect(screen.getByText(/Total Units:/i)).toBeInTheDocument();
+    expect(screen.getByText(/3 \(Units\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Total price:/i)).toBeInTheDocument();
   });
 
-  it('calls removeFromCart when the remove button is clicked', async () => {
+  it('calls deleteItemFromCart when Remove is clicked', async () => {
     const user = userEvent.setup();
-    render(<CartPage />);
 
-    const removeButtons = screen.getAllByRole('button', { name: /remove/i });
+    renderCart();
+
+    const removeButtons = screen.getAllByText(/remove/i);
     await user.click(removeButtons[0]);
 
-    expect(mockRemoveFromCart).toHaveBeenCalledWith('prod_1');
+    expect(mockDeleteItemFromCart).toHaveBeenCalledWith('prod_1');
   });
 
-  it('calls updateQuantity when the quantity input changes', async () => {
+  it('calls addItemToCart with increased quantity when plus button is clicked', async () => {
     const user = userEvent.setup();
-    render(<CartPage />);
 
-    const quantityInputs = screen.getAllByRole('spinbutton');
-    await user.clear(quantityInputs[0]);
-    await user.type(quantityInputs[0], '3');
+    renderCart();
 
-    expect(mockUpdateQuantity).toHaveBeenCalledWith('prod_1', expect.any(Number));
+    const plusButtons = screen.getAllByRole('button', { name: '+' });
+    await user.click(plusButtons[0]);
+
+    expect(mockAddItemToCart).toHaveBeenCalledWith(
+      expect.objectContaining({
+        product: 'prod_1',
+        name: 'Classic Sneakers',
+        quantity: 3,
+      })
+    );
   });
 
-  it('calls clearCart when "Clear Cart" is clicked', async () => {
+  it('calls addItemToCart with decreased quantity when minus button is clicked', async () => {
     const user = userEvent.setup();
-    render(<CartPage />);
 
-    await user.click(screen.getByRole('button', { name: /clear cart/i }));
+    renderCart();
 
-    expect(mockClearCart).toHaveBeenCalledTimes(1);
+    const minusButtons = screen.getAllByRole('button', { name: '−' });
+    await user.click(minusButtons[0]);
+
+    expect(mockAddItemToCart).toHaveBeenCalledWith(
+      expect.objectContaining({
+        product: 'prod_1',
+        name: 'Classic Sneakers',
+        quantity: 1,
+      })
+    );
   });
 
-  it('shows empty state when cart has no items', async () => {
-    jest.resetModules();
-    jest.mock('@/context/CartContext', () => ({
-      useCart: () => ({ cart: [], totalPrice: 0 }),
-    }));
+  it('shows empty cart count when cart has no items', () => {
+    renderCart([]);
 
-    const { default: EmptyCart } = await import('@/components/Cart');
-    render(<EmptyCart />);
-
-    expect(screen.getByText(/your cart is empty/i)).toBeInTheDocument();
+    expect(screen.getByText(/0 Item\(s\) in Cart/i)).toBeInTheDocument();
+    expect(screen.queryByText('Classic Sneakers')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Amount before Tax:/i)).not.toBeInTheDocument();
   });
 });

@@ -7,12 +7,6 @@ const createJestConfig = nextJest({
 
 /** @type {import('jest').Config} */
 const customJestConfig = {
-  setupFilesAfterFramework: ['<rootDir>/jest.setup.js'],
-  setupFilesAfterFramework: undefined,
-  setupFilesAfterFramework: undefined,
-
-  // Use correct key name
-  setupFilesAfterEach: undefined,
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
 
   testEnvironment: 'jest-environment-jsdom',
@@ -27,13 +21,7 @@ const customJestConfig = {
     '<rootDir>/__tests__/**/*.(spec|test).[jt]s?(x)',
   ],
 
-  // Exclude E2E tests from Jest
-  testPathIgnorePatterns: [
-    '<rootDir>/node_modules/',
-    '<rootDir>/.next/',
-    '<rootDir>/e2e/',
-    '<rootDir>/src/__test__/integration/',
-  ],
+  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/.next/', '<rootDir>/e2e/'],
 
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
