@@ -1,10 +1,9 @@
-import dbConnect from '@/backend/config/dbConnect';
-import { verifyIdToken } from '@/backend/config/firebaseAdmin';
-import { Cart } from '@/backend/models/cart';
-
 /**
  * @jest-environment node
  */
+import dbConnect from '@/backend/config/dbConnect';
+import { verifyIdToken } from '@/backend/config/firebaseAdmin';
+import { Cart } from '@/backend/models/cart';
 
 /**
  * Integration Tests — /api/cart
@@ -12,18 +11,6 @@ import { Cart } from '@/backend/models/cart';
  * Covers fetching, adding, updating, removing, and clearing cart items via API.
  * MongoDB and Firebase auth are mocked.
  */
-
-if (typeof Response !== 'undefined' && typeof Response.json !== 'function') {
-  Response.json = function json(data, init = {}) {
-    return new Response(JSON.stringify(data), {
-      ...init,
-      headers: {
-        'content-type': 'application/json',
-        ...(init.headers || {}),
-      },
-    });
-  };
-}
 
 jest.mock('@/backend/config/dbConnect', () => ({
   __esModule: true,

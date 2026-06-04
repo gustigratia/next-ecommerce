@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 import dbConnect from '@/backend/config/dbConnect';
 import { Product } from '@/backend/models/product';
 
