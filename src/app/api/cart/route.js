@@ -4,6 +4,9 @@ import dbConnect from '@/backend/config/dbConnect';
 import { verifyIdToken } from '@/backend/config/firebaseAdmin';
 import { Cart } from '@/backend/models/cart';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 const getUserFromRequest = async (req) => {
   const authHeader = req.headers.get('authorization');
 
