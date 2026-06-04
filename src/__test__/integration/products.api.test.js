@@ -1,14 +1,15 @@
-/**
- * Integration Tests — /api/product
- *
- * These tests exercise the API route handler in-process with mocked
- * MongoDB model/query behavior, so no real database is needed in CI.
- */
 import dbConnect from '@/backend/config/dbConnect';
 import { Product } from '@/backend/models/product';
 
 /**
  * @jest-environment node
+ */
+
+/**
+ * Integration Tests — /api/product
+ *
+ * These tests exercise the API route handler in-process with mocked
+ * MongoDB model/query behavior, so no real database is needed in CI.
  */
 
 if (typeof Response !== 'undefined' && typeof Response.json !== 'function') {
