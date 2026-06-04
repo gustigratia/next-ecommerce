@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 
 import { useFirebaseAppContext } from './FirebaseContext';
 
@@ -11,34 +11,46 @@ export const CartProvider = ({ children }) => {
 
   const [cart, setCart] = useState({ cartItems: [] });
 
-  const getCartKey = () => {
-    if (!user?.uid) return null;
-    return `cart_${user.uid}`;
+  const getAuthToken = async () => {
+    if (!user) return null;
+
+    return user.getIdToken();
   };
 
-  useEffect(() => {
-    if (!loading) {
-      setCartToState();
-    }
-  }, [user, loading]);
+  const fetchCart = async () => {
+    const token = await getAuthToken();
 
-  const setCartToState = () => {
-    const cartKey = getCartKey();
-
-    if (!cartKey) {
+    if (!token) {
       setCart({ cartItems: [] });
       return;
     }
 
-    const storedCart = localStorage.getItem(cartKey);
+    const res = await fetch('/api/cart', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-    setCart(storedCart ? JSON.parse(storedCart) : { cartItems: [] });
+    if (!res.ok) {
+      setCart({ cartItems: [] });
+      return;
+    }
+
+    const data = await res.json();
+    setCart(data.cart || { cartItems: [] });
   };
 
-  const addItemToCart = async ({ product, name, price, image, stock, seller, quantity = 1 }) => {
-    const cartKey = getCartKey();
+  useEffect(() => {
+    if (!loading) {
+      fetchCart();
+    }
+  }, [user, loading]);
 
-    if (!cartKey) {
+  const addItemToCart = async ({ product, name, price, image, stock, seller, quantity = 1 }) => {
+    const token = await getAuthToken();
+
+    if (!token) {
       alert('Please login first');
       return;
     }
@@ -53,35 +65,64 @@ export const CartProvider = ({ children }) => {
       quantity,
     };
 
-    const isItemExist = cart?.cartItems?.find((i) => i.product === item.product);
+    const res = await fetch('/api/cart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(item),
+    });
 
-    let newCartItems;
-
-    if (isItemExist) {
-      newCartItems = cart.cartItems.map((i) => (i.product === isItemExist.product ? item : i));
-    } else {
-      newCartItems = [...(cart.cartItems || []), item];
-    }
-
-    const newCart = { cartItems: newCartItems };
-
-    localStorage.setItem(cartKey, JSON.stringify(newCart));
-    setCart(newCart);
-  };
-
-  const deleteItemFromCart = (id) => {
-    const cartKey = getCartKey();
-
-    if (!cartKey) {
+    if (!res.ok) {
+      alert('Failed to update cart');
       return;
     }
 
-    const newCartItems = cart?.cartItems?.filter((i) => i.product !== id);
+    const data = await res.json();
+    setCart(data.cart);
+  };
 
-    const newCart = { cartItems: newCartItems };
+  const deleteItemFromCart = async (id) => {
+    const token = await getAuthToken();
 
-    localStorage.setItem(cartKey, JSON.stringify(newCart));
-    setCart(newCart);
+    if (!token) return;
+
+    const res = await fetch(`/api/cart?product=${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      alert('Failed to remove item from cart');
+      return;
+    }
+
+    const data = await res.json();
+    setCart(data.cart);
+  };
+
+  const clearCart = async () => {
+    const token = await getAuthToken();
+
+    if (!token) return;
+
+    const res = await fetch('/api/cart', {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      alert('Failed to clear cart');
+      return;
+    }
+
+    const data = await res.json();
+    setCart(data.cart);
   };
 
   return (
@@ -90,6 +131,7 @@ export const CartProvider = ({ children }) => {
         cart,
         addItemToCart,
         deleteItemFromCart,
+        clearCart,
       }}
     >
       {children}

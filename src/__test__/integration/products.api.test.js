@@ -1,152 +1,288 @@
 /**
- * Integration Tests — /api/products
+ * Integration Tests — /api/product
  *
- * These tests exercise the full API handler in-process, with a mocked
- * MongoDB connection so no real database is needed in CI.
+ * These tests exercise the API route handler in-process with mocked
+ * MongoDB model/query behavior, so no real database is needed in CI.
  */
-import { createMocks } from 'node-mocks-http';
+import dbConnect from '@/backend/config/dbConnect';
+import { Product } from '@/backend/models/product';
 
-import Product from '@/models/Product';
+/**
+ * @jest-environment node
+ */
 
-// ── Mock mongoose before importing the handler ──────────────────────────────
-jest.mock('@/lib/mongodb', () => ({
-  connectDB: jest.fn().mockResolvedValue(undefined),
+if (typeof Response !== 'undefined' && typeof Response.json !== 'function') {
+  Response.json = function json(data, init = {}) {
+    return new Response(JSON.stringify(data), {
+      ...init,
+      headers: {
+        'content-type': 'application/json',
+        ...(init.headers || {}),
+      },
+    });
+  };
+}
+
+// Mock dbConnect default export
+jest.mock('@/backend/config/dbConnect', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+
+// Mock named export Product
+jest.mock('@/backend/models/product', () => ({
+  Product: {
+    find: jest.fn(),
+    findById: jest.fn(),
+  },
 }));
 
 const mockProducts = [
   {
     _id: 'prod_1',
-    title: 'Classic Sneakers',
+    name: 'Classic Sneakers',
     price: 99.99,
-    category: 'footwear',
-    image: '/images/sneakers.jpg',
-    rating: 4.5,
+    category: 'Sports',
+    images: [{ url: '/images/sneakers.jpg' }],
+    ratings: 4.5,
     stock: 20,
+    seller: 'Nike',
+    description: 'Comfortable everyday sneakers.',
   },
   {
     _id: 'prod_2',
-    title: 'Running Shoes',
+    name: 'Running Shoes',
     price: 129.99,
-    category: 'footwear',
-    image: '/images/running.jpg',
-    rating: 4.2,
+    category: 'Sports',
+    images: [{ url: '/images/running.jpg' }],
+    ratings: 4.2,
     stock: 15,
+    seller: 'Adidas',
+    description: 'Lightweight running shoes.',
   },
 ];
 
-jest.mock('@/models/Product', () => ({
-  find: jest.fn(),
-  findById: jest.fn(),
-  countDocuments: jest.fn(),
-}));
+function createMockQuery(result) {
+  const query = {
+    find: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    sort: jest.fn().mockReturnThis(),
+    limit: jest.fn().mockReturnThis(),
+    skip: jest.fn().mockReturnThis(),
+    exec: jest.fn().mockResolvedValue(result),
+  };
 
-// ── Helper ───────────────────────────────────────────────────────────────────
-function makeQuery(params = {}) {
-  return Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined));
+  return query;
 }
 
-// ── Tests ────────────────────────────────────────────────────────────────────
-describe('GET /api/products', () => {
-  let handler;
+function createRequest(url) {
+  return new Request(url, {
+    method: 'GET',
+  });
+}
+
+describe('GET /api/product', () => {
+  let GET;
 
   beforeAll(async () => {
-    // Dynamic import so mocks are in place first
-    const mod = await import('@/app/api/products/route');
-    handler = mod.GET;
+    const mod = await import('@/app/api/product/route');
+    GET = mod.GET;
   });
 
   beforeEach(() => {
     jest.clearAllMocks();
+    dbConnect.mockReturnValue(undefined);
   });
 
   it('returns a list of products with 200', async () => {
-    Product.find.mockReturnValue({
-      skip: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockResolvedValue(mockProducts),
-    });
-    Product.countDocuments.mockResolvedValue(2);
+    const mockQuery = createMockQuery(mockProducts);
+    Product.find.mockReturnValue(mockQuery);
 
-    const { req } = createMocks({ method: 'GET', query: {} });
-    const res = await handler(req);
+    const req = createRequest('http://localhost:3000/api/product');
+    const res = await GET(req);
     const body = await res.json();
 
+    expect(dbConnect).toHaveBeenCalledTimes(1);
+    expect(Product.find).toHaveBeenCalledTimes(1);
+
+    expect(mockQuery.limit).toHaveBeenCalledWith(4);
+    expect(mockQuery.skip).toHaveBeenCalledWith(0);
+    expect(mockQuery.exec).toHaveBeenCalledTimes(1);
+
     expect(res.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.message).toBe('Products');
     expect(body.products).toHaveLength(2);
-    expect(body.products[0].title).toBe('Classic Sneakers');
+    expect(body.products[0].name).toBe('Classic Sneakers');
   });
 
   it('filters products by category', async () => {
-    Product.find.mockReturnValue({
-      skip: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockResolvedValue([mockProducts[0]]),
-    });
-    Product.countDocuments.mockResolvedValue(1);
+    const mockQuery = createMockQuery([mockProducts[0]]);
+    Product.find.mockReturnValue(mockQuery);
 
-    const { req } = createMocks({
-      method: 'GET',
-      query: makeQuery({ category: 'footwear' }),
-    });
-    const res = await handler(req);
+    const req = createRequest('http://localhost:3000/api/product?category=Sports');
+    const res = await GET(req);
     const body = await res.json();
 
-    expect(Product.find).toHaveBeenCalledWith(expect.objectContaining({ category: 'footwear' }));
+    expect(res.status).toBe(200);
+    expect(mockQuery.where).toHaveBeenCalledWith({ category: 'Sports' });
     expect(body.products).toHaveLength(1);
+    expect(body.products[0].category).toBe('Sports');
   });
 
-  it('supports pagination via page & limit params', async () => {
-    Product.find.mockReturnValue({
-      skip: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockResolvedValue([mockProducts[1]]),
-    });
-    Product.countDocuments.mockResolvedValue(2);
+  it('supports keyword search', async () => {
+    const mockQuery = createMockQuery([mockProducts[0]]);
+    Product.find.mockReturnValue(mockQuery);
 
-    const { req } = createMocks({ method: 'GET', query: { page: '2', limit: '1' } });
-    const res = await handler(req);
+    const req = createRequest('http://localhost:3000/api/product?keyword=Sneakers');
+    const res = await GET(req);
     const body = await res.json();
 
-    expect(body.currentPage).toBe(2);
-    expect(body.totalPages).toBe(2);
+    expect(res.status).toBe(200);
+    expect(mockQuery.find).toHaveBeenCalledWith({
+      name: {
+        $regex: 'Sneakers',
+        $options: 'i',
+      },
+    });
+    expect(body.products[0].name).toBe('Classic Sneakers');
   });
 
-  it('returns 500 when the database throws', async () => {
+  it('supports low-to-high price sorting', async () => {
+    const mockQuery = createMockQuery(mockProducts);
+    Product.find.mockReturnValue(mockQuery);
+
+    const req = createRequest('http://localhost:3000/api/product?sort=lowToHigh');
+    const res = await GET(req);
+
+    expect(res.status).toBe(200);
+    expect(mockQuery.sort).toHaveBeenCalledWith('price');
+  });
+
+  it('supports high-to-low price sorting', async () => {
+    const mockQuery = createMockQuery(mockProducts);
+    Product.find.mockReturnValue(mockQuery);
+
+    const req = createRequest('http://localhost:3000/api/product?sort=highToLow');
+    const res = await GET(req);
+
+    expect(res.status).toBe(200);
+    expect(mockQuery.sort).toHaveBeenCalledWith('-price');
+  });
+
+  it('supports rating filter', async () => {
+    const mockQuery = createMockQuery([mockProducts[0]]);
+    Product.find.mockReturnValue(mockQuery);
+
+    const req = createRequest('http://localhost:3000/api/product?rating=4');
+    const res = await GET(req);
+
+    expect(res.status).toBe(200);
+    expect(mockQuery.where).toHaveBeenCalledWith({
+      ratings: {
+        $gte: '4',
+      },
+    });
+  });
+
+  it('supports pagination via page param', async () => {
+    const mockQuery = createMockQuery([mockProducts[1]]);
+    Product.find.mockReturnValue(mockQuery);
+
+    const req = createRequest('http://localhost:3000/api/product?page=2');
+    const res = await GET(req);
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+
+    // resPerPage in the actual route is fixed to 4
+    expect(mockQuery.limit).toHaveBeenCalledWith(4);
+    expect(mockQuery.skip).toHaveBeenCalledWith(4);
+
+    expect(body.products).toHaveLength(1);
+    expect(body.products[0].name).toBe('Running Shoes');
+  });
+
+  it('returns 500 when the database query throws', async () => {
     Product.find.mockImplementation(() => {
       throw new Error('DB connection failed');
     });
 
-    const { req } = createMocks({ method: 'GET', query: {} });
-    const res = await handler(req);
+    const req = createRequest('http://localhost:3000/api/product');
+    const res = await GET(req);
+    const body = await res.json();
 
     expect(res.status).toBe(500);
+    expect(body.error).toBe('Internal Server Error');
   });
 });
 
-describe('GET /api/products/[id]', () => {
-  let handler;
+describe('GET /api/product/[singleProductId]', () => {
+  let GET;
 
   beforeAll(async () => {
-    const mod = await import('@/app/api/products/[id]/route');
-    handler = mod.GET;
+    const mod = await import('@/app/api/product/[singleProductId]/route');
+    GET = mod.GET;
   });
 
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    dbConnect.mockReturnValue(undefined);
+  });
 
   it('returns a single product by id', async () => {
     Product.findById.mockResolvedValue(mockProducts[0]);
 
-    const { req } = createMocks({ method: 'GET' });
-    const res = await handler(req, { params: { id: 'prod_1' } });
+    const req = createRequest('http://localhost:3000/api/product/prod_1');
+
+    const res = await GET(req, {
+      params: {
+        singleProductId: 'prod_1',
+      },
+    });
+
+    const body = await res.json();
+
+    expect(dbConnect).toHaveBeenCalledTimes(1);
+    expect(Product.findById).toHaveBeenCalledWith('prod_1');
+
+    expect(res.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.singleProductDetail.name).toBe('Classic Sneakers');
+  });
+
+  it('returns 200 with null singleProductDetail when product is not found', async () => {
+    Product.findById.mockResolvedValue(null);
+
+    const req = createRequest('http://localhost:3000/api/product/nonexistent');
+
+    const res = await GET(req, {
+      params: {
+        singleProductId: 'nonexistent',
+      },
+    });
+
     const body = await res.json();
 
     expect(res.status).toBe(200);
-    expect(body.product.title).toBe('Classic Sneakers');
+    expect(body.success).toBe(true);
+    expect(body.singleProductDetail).toBeNull();
   });
 
-  it('returns 404 when product is not found', async () => {
-    Product.findById.mockResolvedValue(null);
+  it('returns 502 when findById throws an error', async () => {
+    Product.findById.mockRejectedValue(new Error('Product lookup failed'));
 
-    const { req } = createMocks({ method: 'GET' });
-    const res = await handler(req, { params: { id: 'nonexistent' } });
+    const req = createRequest('http://localhost:3000/api/product/prod_1');
 
-    expect(res.status).toBe(404);
+    const res = await GET(req, {
+      params: {
+        singleProductId: 'prod_1',
+      },
+    });
+
+    const body = await res.json();
+
+    expect(res.status).toBe(502);
+    expect(body.error).toBe('Product lookup failed');
   });
 });
