@@ -59,7 +59,7 @@ describe('ProductItem', () => {
     renderProductItem();
 
     expect(screen.getByText('Classic Sneakers')).toBeInTheDocument();
-    expect(screen.getByText(/99,99/)).toBeInTheDocument();
+    expect(screen.getByText(/99[,.]99/)).toBeInTheDocument();
   });
 
   it('renders the product image', () => {

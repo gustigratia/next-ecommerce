@@ -37,6 +37,14 @@ import CartContext from '../context/CartContext';
  * @returns {JSX.Element} - Rendered ProductItem component.
  */
 
+/**
+ * ProductItem component is responsible for rendering an individual product in a styled card format.
+ * It displays product information such as name, image, ratings, description, price, and provides an option to add the product to the cart.
+ * @param {Object} props - Component properties.
+ * @param {Object} props.product - Object containing details of the product to be displayed.
+ * @returns {JSX.Element} - Rendered ProductItem component.
+ */
+
 const ProductItem = ({ product }) => {
   const { addItemToCart } = useContext(CartContext);
 
@@ -101,7 +109,11 @@ const ProductItem = ({ product }) => {
           <div className="p-5">
             {/* Product Price */}
             <span className="text-2xl font-semibold text-black">
-              ₹ {product?.price.toLocaleString()}
+              ₹{' '}
+              {Number(product?.price).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </span>
             {/* Shipping Information */}
             <p className="text-green-600">Free Shipping</p>
