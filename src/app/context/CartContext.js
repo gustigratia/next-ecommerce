@@ -1,117 +1,142 @@
-"use client";
+'use client';
 
-import { createContext, useState, useEffect, useContext } from "react";
-import { useFirebaseAppContext } from "./FirebaseContext";
+import { createContext, useEffect, useState } from 'react';
+
+import { useFirebaseAppContext } from './FirebaseContext';
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-    const { user, loading } = useFirebaseAppContext();
+  const { user, loading } = useFirebaseAppContext();
 
-    const [cart, setCart] = useState({ cartItems: [] });
+  const [cart, setCart] = useState({ cartItems: [] });
 
-    const getCartKey = () => {
-        if (!user?.uid) return null;
-        return `cart_${user.uid}`;
+  const getAuthToken = async () => {
+    if (!user) return null;
+
+    return user.getIdToken();
+  };
+
+  const fetchCart = async () => {
+    const token = await getAuthToken();
+
+    if (!token) {
+      setCart({ cartItems: [] });
+      return;
+    }
+
+    const res = await fetch('/api/cart', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      setCart({ cartItems: [] });
+      return;
+    }
+
+    const data = await res.json();
+    setCart(data.cart || { cartItems: [] });
+  };
+
+  useEffect(() => {
+    if (!loading) {
+      fetchCart();
+    }
+  }, [user, loading]);
+
+  const addItemToCart = async ({ product, name, price, image, stock, seller, quantity = 1 }) => {
+    const token = await getAuthToken();
+
+    if (!token) {
+      alert('Please login first');
+      return;
+    }
+
+    const item = {
+      product,
+      name,
+      price,
+      image,
+      stock,
+      seller,
+      quantity,
     };
 
-    useEffect(() => {
-        if (!loading) {
-            setCartToState();
-        }
-    }, [user, loading]);
+    const res = await fetch('/api/cart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(item),
+    });
 
-    const setCartToState = () => {
-        const cartKey = getCartKey();
+    if (!res.ok) {
+      alert('Failed to update cart');
+      return;
+    }
 
-        if (!cartKey) {
-            setCart({ cartItems: [] });
-            return;
-        }
+    const data = await res.json();
+    setCart(data.cart);
+  };
 
-        const storedCart = localStorage.getItem(cartKey);
+  const deleteItemFromCart = async (id) => {
+    const token = await getAuthToken();
 
-        setCart(
-            storedCart
-                ? JSON.parse(storedCart)
-                : { cartItems: [] }
-        );
-    };
+    if (!token) return;
 
-    const addItemToCart = async ({
-        product,
-        name,
-        price,
-        image,
-        stock,
-        seller,
-        quantity = 1,
-    }) => {
-        const cartKey = getCartKey();
+    const res = await fetch(`/api/cart?product=${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-        if (!cartKey) {
-            alert("Please login first");
-            return;
-        }
+    if (!res.ok) {
+      alert('Failed to remove item from cart');
+      return;
+    }
 
-        const item = {
-            product,
-            name,
-            price,
-            image,
-            stock,
-            seller,
-            quantity,
-        };
+    const data = await res.json();
+    setCart(data.cart);
+  };
 
-        const isItemExist = cart?.cartItems?.find(
-            (i) => i.product === item.product
-        );
+  const clearCart = async () => {
+    const token = await getAuthToken();
 
-        let newCartItems;
+    if (!token) return;
 
-        if (isItemExist) {
-            newCartItems = cart.cartItems.map((i) =>
-                i.product === isItemExist.product ? item : i
-            );
-        } else {
-            newCartItems = [...(cart.cartItems || []), item];
-        }
+    const res = await fetch('/api/cart', {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-        const newCart = { cartItems: newCartItems };
+    if (!res.ok) {
+      alert('Failed to clear cart');
+      return;
+    }
 
-        localStorage.setItem(cartKey, JSON.stringify(newCart));
-        setCart(newCart);
-    };
+    const data = await res.json();
+    setCart(data.cart);
+  };
 
-    const deleteItemFromCart = (id) => {
-        const cartKey = getCartKey();
-
-        if (!cartKey) {
-            return;
-        }
-
-        const newCartItems = cart?.cartItems?.filter(
-            (i) => i.product !== id
-        );
-
-        const newCart = { cartItems: newCartItems };
-
-        localStorage.setItem(cartKey, JSON.stringify(newCart));
-        setCart(newCart);
-    };
-
-    return (
-        <CartContext.Provider
-            value={{
-                cart,
-                addItemToCart,
-                deleteItemFromCart,
-            }}
-        >
-            {children}
-        </CartContext.Provider>
-    );
+  return (
+    <CartContext.Provider
+      value={{
+        cart,
+        addItemToCart,
+        deleteItemFromCart,
+        clearCart,
+      }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
 };
 
 export default CartContext;

@@ -1,16 +1,18 @@
-import { Poppins } from 'next/font/google'
-import './globals.css'
-import NavBar from './components/nav/NavBar'
-import Footer from './components/footer/Footer'
-import FirebaseContextProvider from './context/FirebaseContext'
-import { CartProvider } from './context/CartContext'
+import { Poppins } from 'next/font/google';
+import Script from 'next/script';
 
-const poppins = Poppins({ subsets: ['latin'], weight: ["400", "700"] })
+import Footer from './components/footer/Footer';
+import NavBar from './components/nav/NavBar';
+import { CartProvider } from './context/CartContext';
+import FirebaseContextProvider from './context/FirebaseContext';
+import './globals.css';
+
+const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] });
 
 export const metadata = {
   title: 'E-Commerce App',
   description: 'Generated E-Commerce App',
-}
+};
 
 export default function RootLayout({ children }) {
   return (
@@ -18,18 +20,16 @@ export default function RootLayout({ children }) {
       <body className={`${poppins.className} text-slate-700`}>
         <FirebaseContextProvider>
           <CartProvider>
-            <div className='flex flex-col min-h-screen'>
+            <div className="flex flex-col min-h-screen">
               <NavBar />
-              <main className='flex-grow'>
-                {children}
-              </main>
+              <main className="flex-grow">{children}</main>
               <Footer />
             </div>
           </CartProvider>
         </FirebaseContextProvider>
 
-        <script src="https://kit.fontawesome.com/83b993c0e4.js"></script>
+        <Script src="https://kit.fontawesome.com/83b993c0e4.js" strategy="afterInteractive" />
       </body>
     </html>
-  )
+  );
 }

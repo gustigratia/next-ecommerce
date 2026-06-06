@@ -6,16 +6,15 @@
  * @param {Object} params - Route parameters, including 'singleProductId' for the specific product.
  * @returns {JSX.Element} - Rendered component displaying the single product details and similar items.
  */
-import axios from "axios";
-import SingleProductDetail from "@/app/clientComponent/SingleProductDetail";
-import SimilarItems from "@/app/clientComponent/SimilarItems";
+import axios from 'axios';
+
+import SimilarItems from '@/app/clientComponent/SimilarItems';
+import SingleProductDetail from '@/app/clientComponent/SingleProductDetail';
 
 const singleProduct = async ({ params }) => {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
-  const { data } = await axios.get(
-    `${baseUrl}/api/product/${params.singleProductId}`
-  );
+  const { data } = await axios.get(`${baseUrl}/api/product/${params.singleProductId}`);
 
   const productData = await axios.get(`${baseUrl}/api/product`);
 
