@@ -3,10 +3,11 @@
  * and copyright information.
  * @returns {JSX.Element} - Rendered component for the website footer.
  */
-import React from 'react';
 import Image from 'next/image';
-import Logo from '@/../../public/svg/logo-no-background.svg';
 import Link from 'next/link';
+import React from 'react';
+
+import Logo from '@/../../public/svg/logo-no-background.svg';
 
 const Footer = () => {
   return (
@@ -36,7 +37,9 @@ const Footer = () => {
       <hr className="my-2 sm:my-6 w-full md:w-[90%] mx-auto" />
 
       {/* Copyright information */}
-      <p className="text-center font-serif">&copy; {new Date().getFullYear()} Ecom-Web. All rights reserved.</p>
+      <p className="text-center font-serif">
+        &copy; {new Date().getFullYear()} Ecom-Web. All rights reserved.
+      </p>
     </footer>
   );
 };

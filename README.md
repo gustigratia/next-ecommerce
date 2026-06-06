@@ -1,16 +1,20 @@
 # Ecommerce Web Application
+
 ### Tech Stack Used : (Next JS + Tailwind CSS + FireBase + MongoDB + Axios)
- ## Objectives:
-  - Develope a Ecommerce Plateform (web application)
-  - Make Full-Stack Features and use Firebase Authentication.
-  - Use mongo-DB for store data. (App-Routing Next JS)/Tailwind css
-  
-  ## Features:
-  - Login/Signup pages using google Firebase.
-  - Data operation on MongoDB (handle REST API).
-  - Diffrent Filter feature handled.
-  - Pagination (pagination request on API)
-  - managed Cart
+
+## Objectives:
+
+- Develope a Ecommerce Plateform (web application)
+- Make Full-Stack Features and use Firebase Authentication.
+- Use mongo-DB for store data. (App-Routing Next JS)/Tailwind css
+
+## Features:
+
+- Login/Signup pages using google Firebase.
+- Data operation on MongoDB (handle REST API).
+- Diffrent Filter feature handled.
+- Pagination (pagination request on API)
+- managed Cart
 
 ### Application Page and Functanality
 
@@ -35,19 +39,18 @@
 ![homePage](https://res.cloudinary.com/ecom-next/image/upload/v1700736499/products/mwckxrc8fxculaflbcic.png)
 
 - CART
-![homePage](https://res.cloudinary.com/ecom-next/image/upload/v1700736500/products/dwlfq93xc94roa5dfin4.png)
+  ![homePage](https://res.cloudinary.com/ecom-next/image/upload/v1700736500/products/dwlfq93xc94roa5dfin4.png)
 
 - SIGN UP / SIGN IN
 
 ![homePage](https://res.cloudinary.com/ecom-next/image/upload/v1700736500/products/llwwe0tpzkzzl3grp29o.png)
 
-
 ## FOR RUNNING PROJECT IN YOUR SYSTEM DO
+
       npm i
       npm run dev
 
 ## main aim of this project for develope ecommerce plateform. genearate admin role for create new products
-
 
 - i have to work more on this application
 
@@ -55,8 +58,6 @@
 
 This project was originally created by:
 
-[@Divya Gaurav]( https://divyagaurav.netlify.app/ )
+[@Divya Gaurav](https://divyagaurav.netlify.app/)
 
 The repository has been forked and is being further developed by the current maintainer.
-
-
