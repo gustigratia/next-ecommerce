@@ -21,6 +21,9 @@ jobs:
     name: Deploy to Staging
     runs-on: ubuntu-latest
 
+    outputs:
+      service_url: ${{ steps.staging-url.outputs.staging_url }}
+
     permissions:
       contents: read
       id-token: write
