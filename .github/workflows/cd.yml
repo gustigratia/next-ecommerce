@@ -18,7 +18,7 @@ env:
 
 jobs:
   deploy-staging:
-    name: Build and Deploy to Cloud Run
+    name: Deploy to Staging
     runs-on: ubuntu-latest
 
     permissions:
@@ -85,12 +85,14 @@ jobs:
             NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
             NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
 
-      - name: Show service URL
+      - name: Get staging service URL
+        id: staging-url
         run: |
-          STAGING_URL = $(gcloud run services describe ${{ env.SERVICE_NAME_STAGING }} \
+          STAGING_URL=$(gcloud run services describe ${{ env.SERVICE_NAME_STAGING }} \
             --region ${{ env.REGION }} \
             --format="value(status.url)")
 
+          echo "staging_url=$STAGING_URL" >> "$GITHUB_OUTPUT"
           echo "Service URL: $STAGING_URL"
 
   e2e-test:
