@@ -21,9 +21,6 @@ jobs:
     name: Deploy to Staging
     runs-on: ubuntu-latest
 
-    outputs:
-      service_url: ${{ steps.staging-url.outputs.staging_url }}
-
     permissions:
       contents: read
       id-token: write
@@ -31,8 +28,8 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     outputs:
-      image: ${{ steps.image.outputs.image }}
-      staging_url: ${{ steps.staging-url.outputs.staging_url }}
+      service_url: ${{ steps.staging-url.outputs.staging_url }}
+      image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.event.workflow_run.head_sha }}
 
     steps:
       - name: Checkout repository
