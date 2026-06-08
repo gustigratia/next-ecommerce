@@ -31,6 +31,12 @@ import Styles from '../style/LoginSingnup.module.css';
  * Displays login form, input fields, and authentication buttons.
  */
 
+/**
+ * LogIn component handles user login functionality, including email/password login, Google sign-in, and Twitter sign-in.
+ * Uses Firebase authentication methods for user authentication.
+ * Displays login form, input fields, and authentication buttons.
+ */
+
 const LogIn = () => {
   const { handleSignInWithGoogle, handleSignInWithEmailAndPassword, handleSignInWithTwitter } =
     useFirebaseAppContext();
@@ -165,8 +171,8 @@ const LogIn = () => {
                   <span className="text-xs text-gray-400 font-semibold">
                     Don't have an account?
                   </span>
-                  <Link href="/signup">
-                    <span className={Styles.forget}>Sign up</span>
+                  <Link href="/signup" className={Styles.forget} data-cy="signup-link">
+                    Sign up
                   </Link>
                 </div>
               </div>

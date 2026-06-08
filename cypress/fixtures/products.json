@@ -1,0 +1,107 @@
+{
+  "page1": {
+    "message": "Products",
+    "success": true,
+    "currentPage": 1,
+    "totalProducts": 5,
+    "totalPages": 2,
+    "resPerPage": 4,
+    "products": [
+      {
+        "_id": "prod_1",
+        "name": "Samsung Smart TV 55 Inch",
+        "description": "Large screen smart television for home entertainment.",
+        "price": 8500000,
+        "seller": "Samsung Official",
+        "stock": 12,
+        "ratings": 4.5,
+        "category": "Electronics",
+        "images": [
+          {
+            "public_id": "tv_1",
+            "url": "https://images.unsplash.com/photo-1593784991095-a205069470b6"
+          }
+        ],
+        "reviews": []
+      },
+      {
+        "_id": "prod_2",
+        "name": "MacBook Air M2",
+        "description": "Lightweight laptop for productivity and study.",
+        "price": 15999000,
+        "seller": "Apple Store",
+        "stock": 5,
+        "ratings": 4.8,
+        "category": "Laptops",
+        "images": [
+          {
+            "public_id": "macbook_1",
+            "url": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8"
+          }
+        ],
+        "reviews": []
+      },
+      {
+        "_id": "prod_3",
+        "name": "Sony Wireless Headphones",
+        "description": "Noise cancelling headphones with long battery life.",
+        "price": 2999000,
+        "seller": "Sony Official",
+        "stock": 8,
+        "ratings": 4.3,
+        "category": "Headphones",
+        "images": [
+          {
+            "public_id": "headphones_1",
+            "url": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e"
+          }
+        ],
+        "reviews": []
+      },
+      {
+        "_id": "prod_4",
+        "name": "Canon Mirrorless Camera",
+        "description": "Compact camera for content creation.",
+        "price": 10500000,
+        "seller": "Canon Store",
+        "stock": 3,
+        "ratings": 4.6,
+        "category": "Cameras",
+        "images": [
+          {
+            "public_id": "camera_1",
+            "url": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32"
+          }
+        ],
+        "reviews": []
+      }
+    ]
+  },
+  "page2": {
+    "message": "Products",
+    "success": true,
+    "currentPage": 2,
+    "totalProducts": 5,
+    "totalPages": 2,
+    "resPerPage": 4,
+    "products": [
+      {
+        "_id": "prod_5",
+        "name": "Travel Backpack",
+        "description": "Durable backpack for sports and daily travel.",
+        "price": 650000,
+        "seller": "Outdoor Gear",
+        "stock": 20,
+        "ratings": 4.1,
+        "category": "Sports",
+        "images": [
+          {
+            "public_id": "bag_1",
+            "url": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62"
+          }
+        ],
+        "reviews": []
+      }
+    ]
+  }
+}

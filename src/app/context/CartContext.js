@@ -4,41 +4,56 @@ import { createContext, useEffect, useState } from 'react';
 
 import { useFirebaseAppContext } from './FirebaseContext';
 
-const CartContext = createContext();
+const CartContext = createContext({
+  cart: { cartItems: [] },
+  addItemToCart: async () => {},
+  deleteItemFromCart: async () => {},
+  clearCart: async () => {},
+});
 
 export const CartProvider = ({ children }) => {
   const { user, loading } = useFirebaseAppContext();
 
   const [cart, setCart] = useState({ cartItems: [] });
 
+  const normalizeCart = (cartData) => {
+    return {
+      ...cartData,
+      cartItems: Array.isArray(cartData?.cartItems) ? cartData.cartItems : [],
+    };
+  };
+
   const getAuthToken = async () => {
     if (!user) return null;
-
     return user.getIdToken();
   };
 
   const fetchCart = async () => {
-    const token = await getAuthToken();
+    try {
+      const token = await getAuthToken();
 
-    if (!token) {
+      if (!token) {
+        setCart({ cartItems: [] });
+        return;
+      }
+
+      const res = await fetch('/api/cart', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        setCart({ cartItems: [] });
+        return;
+      }
+
+      const data = await res.json();
+      setCart(normalizeCart(data.cart));
+    } catch (error) {
       setCart({ cartItems: [] });
-      return;
     }
-
-    const res = await fetch('/api/cart', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!res.ok) {
-      setCart({ cartItems: [] });
-      return;
-    }
-
-    const data = await res.json();
-    setCart(data.cart || { cartItems: [] });
   };
 
   useEffect(() => {
@@ -80,7 +95,7 @@ export const CartProvider = ({ children }) => {
     }
 
     const data = await res.json();
-    setCart(data.cart);
+    setCart(normalizeCart(data.cart));
   };
 
   const deleteItemFromCart = async (id) => {
@@ -101,7 +116,7 @@ export const CartProvider = ({ children }) => {
     }
 
     const data = await res.json();
-    setCart(data.cart);
+    setCart(normalizeCart(data.cart));
   };
 
   const clearCart = async () => {
@@ -122,7 +137,7 @@ export const CartProvider = ({ children }) => {
     }
 
     const data = await res.json();
-    setCart(data.cart);
+    setCart(normalizeCart(data.cart));
   };
 
   return (
