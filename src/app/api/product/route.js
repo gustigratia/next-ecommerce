@@ -73,35 +73,51 @@ export async function POST(request) {
 // }
 
 // Handler function for handling GET requests to fetch products with filters and pagination
-export async function GET(req, res) {
-  // Extract search parameters from the request URL
+export async function GET(req) {
   const { searchParams } = new URL(req.url);
-  // Set the number of products to be displayed per page
+
   const resPerPage = 4;
+  const currentPage = Number(searchParams.get('page')) || 1;
+
+  const queryParams = {
+    category: searchParams.get('category'),
+    keyword: searchParams.get('keyword'),
+    sort: searchParams.get('sort'),
+    page: searchParams.get('page'),
+    rating: searchParams.get('rating'),
+  };
 
   try {
-    // Connect to the database
-    dbConnect();
-    // Create an instance of APIFilters with provided search parameters
-    const filters = new APIFilters(Product.find(), {
-      category: searchParams.get('category'),
-      keyword: searchParams.get('keyword'),
-      sort: searchParams.get('sort'),
-      page: searchParams.get('page'),
-      rating: searchParams.get('rating'),
-    });
-    // Execute the filtering, searching, and pagination operations
-    const products = await filters.search().filter().pagination(resPerPage).execute();
-    // Return a JSON response with the filtered products and a success message
+    await dbConnect();
+
+    // Untuk menghitung jumlah product setelah search dan filter
+    const filteredProducts = await new APIFilters(Product.find(), queryParams)
+      .search()
+      .filter()
+      .execute();
+
+    const totalProducts = filteredProducts.length;
+    const totalPages = Math.ceil(totalProducts / resPerPage);
+
+    // Untuk mengambil product sesuai halaman sekarang
+    const products = await new APIFilters(Product.find(), queryParams)
+      .search()
+      .filter()
+      .pagination(resPerPage)
+      .execute();
+
     return NextResponse.json(
       {
         message: 'Products',
         success: true,
         products,
+        currentPage,
+        totalProducts,
+        totalPages,
+        resPerPage,
       },
       { status: 200 }
     );
-    // Log and return a JSON response with an error message and a 500 status code if an error occurs
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
