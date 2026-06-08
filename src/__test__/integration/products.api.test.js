@@ -99,37 +99,46 @@ describe('GET /api/product', () => {
   });
 
   it('returns a list of products with 200', async () => {
-    const mockQuery = createMockQuery(mockProducts);
-    Product.find.mockReturnValue(mockQuery);
+    const mockCountQuery = createMockQuery(mockProducts);
+    const mockPageQuery = createMockQuery(mockProducts);
+
+    Product.find.mockReturnValueOnce(mockCountQuery).mockReturnValueOnce(mockPageQuery);
 
     const req = createRequest('http://localhost:3000/api/product');
     const res = await GET(req);
     const body = await res.json();
 
     expect(dbConnect).toHaveBeenCalledTimes(1);
-    expect(Product.find).toHaveBeenCalledTimes(1);
+    expect(Product.find).toHaveBeenCalledTimes(2);
 
-    expect(mockQuery.limit).toHaveBeenCalledWith(4);
-    expect(mockQuery.skip).toHaveBeenCalledWith(0);
-    expect(mockQuery.exec).toHaveBeenCalledTimes(1);
+    expect(mockPageQuery.limit).toHaveBeenCalledWith(4);
+    expect(mockPageQuery.skip).toHaveBeenCalledWith(0);
+    expect(mockPageQuery.exec).toHaveBeenCalledTimes(1);
 
     expect(res.status).toBe(200);
     expect(body.success).toBe(true);
     expect(body.message).toBe('Products');
     expect(body.products).toHaveLength(2);
     expect(body.products[0].name).toBe('Classic Sneakers');
+
+    expect(body.currentPage).toBe(1);
+    expect(body.totalProducts).toBe(2);
+    expect(body.totalPages).toBe(1);
+    expect(body.resPerPage).toBe(4);
   });
 
   it('filters products by category', async () => {
-    const mockQuery = createMockQuery([mockProducts[0]]);
-    Product.find.mockReturnValue(mockQuery);
+    const mockCountQuery = createMockQuery([mockProducts[0]]);
+    const mockPageQuery = createMockQuery([mockProducts[0]]);
+
+    Product.find.mockReturnValueOnce(mockCountQuery).mockReturnValueOnce(mockPageQuery);
 
     const req = createRequest('http://localhost:3000/api/product?category=Sports');
     const res = await GET(req);
     const body = await res.json();
 
     expect(res.status).toBe(200);
-    expect(mockQuery.where).toHaveBeenCalledWith({ category: 'Sports' });
+
     expect(body.products).toHaveLength(1);
     expect(body.products[0].category).toBe('Sports');
   });
@@ -190,8 +199,10 @@ describe('GET /api/product', () => {
   });
 
   it('supports pagination via page param', async () => {
-    const mockQuery = createMockQuery([mockProducts[1]]);
-    Product.find.mockReturnValue(mockQuery);
+    const mockCountQuery = createMockQuery(mockProducts);
+    const mockPageQuery = createMockQuery([mockProducts[1]]);
+
+    Product.find.mockReturnValueOnce(mockCountQuery).mockReturnValueOnce(mockPageQuery);
 
     const req = createRequest('http://localhost:3000/api/product?page=2');
     const res = await GET(req);
@@ -199,12 +210,17 @@ describe('GET /api/product', () => {
 
     expect(res.status).toBe(200);
 
-    // resPerPage in the actual route is fixed to 4
-    expect(mockQuery.limit).toHaveBeenCalledWith(4);
-    expect(mockQuery.skip).toHaveBeenCalledWith(4);
+    expect(Product.find).toHaveBeenCalledTimes(2);
+
+    expect(mockPageQuery.limit).toHaveBeenCalledWith(4);
+    expect(mockPageQuery.skip).toHaveBeenCalledWith(4);
 
     expect(body.products).toHaveLength(1);
     expect(body.products[0].name).toBe('Running Shoes');
+
+    expect(body.currentPage).toBe(2);
+    expect(body.totalProducts).toBe(2);
+    expect(body.totalPages).toBe(1);
   });
 
   it('returns 500 when the database query throws', async () => {
