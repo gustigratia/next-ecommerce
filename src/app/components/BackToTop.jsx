@@ -16,7 +16,7 @@ const BackToTop = () => {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className="fixed bottom-20 right-5 z-50 bg-red-950 text-white w-11 h-11 rounded-full shadow-lg flex items-center justify-center hover:bg-red-800 hover:scale-110 active:scale-95 transition-all duration-200"
+      className="fixed bottom-20 right-5 z-50 bg-yellow-600 text-white w-11 h-11 rounded-full shadow-lg flex items-center justify-center hover:bg-yellow-500 hover:scale-110 active:scale-95 transition-all duration-200"
       aria-label="Kembali ke atas"
     >
       <i className="fas fa-chevron-up text-sm"></i>
