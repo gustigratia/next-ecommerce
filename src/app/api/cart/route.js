@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import dbConnect from '@/backend/config/dbConnect';
-import { verifyIdToken } from '@/backend/config/firebaseAdmin';
+import admin from "@/backend/config/firebaseAdmin";
 import { Cart } from '@/backend/models/cart';
 
 export const runtime = 'nodejs';
@@ -15,7 +15,7 @@ const getUserFromRequest = async (req) => {
   }
 
   const token = authHeader.split('Bearer ')[1];
-  const decodedToken = await verifyIdToken(token);
+  const decodedToken = await admin.auth().verifyIdToken(token);
 
   return decodedToken;
 };

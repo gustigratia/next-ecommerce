@@ -1,22 +1,24 @@
-// src/backend/config/firebaseAdmin.js
+import admin from "firebase-admin";
 
-import { cert, getApps, initializeApp } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
+if (!admin.apps.length) {
+  const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID;
+  const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
+  const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(
+    /\\n/g,
+    "\n"
+  );
 
-const getFirebaseAdminApp = () => {
-  if (getApps().length > 0) {
-    return getApps()[0];
+  if (!projectId || !clientEmail || !privateKey) {
+    throw new Error("Missing Firebase Admin environment variables");
   }
 
-  return initializeApp({
-    credential: cert({
-      projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId,
+      clientEmail,
+      privateKey,
     }),
   });
-};
+}
 
-const firebaseAdminApp = getFirebaseAdminApp();
-
-export const adminAuth = getAuth(firebaseAdminApp);
+export default admin;
