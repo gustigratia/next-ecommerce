@@ -168,9 +168,12 @@ const Cart = () => {
                     </li>
                   </ul>
                   {/* Continue button */}
-                  <a className="px-4 py-3 mb-2 inline-block text-lg w-full text-center font-medium text-white bg-red-800 border border-transparent rounded-md hover:bg-yellow-700 cursor-pointer">
-                    Continue
-                  </a>
+                  <Link
+                  href="/checkout"
+                  className="px-4 py-3 mb-2 inline-block text-lg w-full text-center font-medium text-white bg-red-800 border border-transparent rounded-md hover:bg-yellow-700 cursor-pointer"
+                  >
+                  Continue
+                  </Link>
                   {/* Back to shop button */}
                   <Link
                     href="/"

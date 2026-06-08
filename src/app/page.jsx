@@ -1,9 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 
 import HeroAnimation from '../app/components/hero/HeroAnimation';
 
-export const dynamic = 'force-dynamic';
+dynamic(() => import('@/app/components/hero/HeroAnimation'), { ssr: false });
 
 const staticLinkData = [
   {
