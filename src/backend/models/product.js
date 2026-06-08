@@ -45,9 +45,15 @@ const productSchema = new mongoose.Schema({
   },
   reviews: [
     {
+      name: {
+        type: String,
+        default: 'Anonymous',
+      },
       rating: {
         type: Number,
         required: true,
+        min: 1,
+        max: 5,
       },
       comment: {
         type: String,
@@ -59,6 +65,10 @@ const productSchema = new mongoose.Schema({
       },
     },
   ],
+  ratings: {
+    type: Number,
+    default: 0,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

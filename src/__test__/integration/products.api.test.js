@@ -247,7 +247,7 @@ describe('GET /api/product/[singleProductId]', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    dbConnect.mockReturnValue(undefined);
+    dbConnect.mockResolvedValue(undefined);
   });
 
   it('returns a single product by id', async () => {
@@ -268,10 +268,11 @@ describe('GET /api/product/[singleProductId]', () => {
 
     expect(res.status).toBe(200);
     expect(body.success).toBe(true);
+    expect(body.message).toBe('Single product fetched successfully');
     expect(body.singleProductDetail.name).toBe('Classic Sneakers');
   });
 
-  it('returns 200 with null singleProductDetail when product is not found', async () => {
+  it('returns 404 when product is not found', async () => {
     Product.findById.mockResolvedValue(null);
 
     const req = createRequest('http://localhost:3000/api/product/nonexistent');
@@ -284,9 +285,9 @@ describe('GET /api/product/[singleProductId]', () => {
 
     const body = await res.json();
 
-    expect(res.status).toBe(200);
-    expect(body.success).toBe(true);
-    expect(body.singleProductDetail).toBeNull();
+    expect(res.status).toBe(404);
+    expect(body.success).toBe(false);
+    expect(body.message).toBe('Product not found');
   });
 
   it('returns 502 when findById throws an error', async () => {
@@ -304,5 +305,206 @@ describe('GET /api/product/[singleProductId]', () => {
 
     expect(res.status).toBe(502);
     expect(body.error).toBe('Product lookup failed');
+  });
+});
+
+describe('POST /api/product/[singleProductId]', () => {
+  let POST;
+
+  beforeAll(async () => {
+    const mod = await import('@/app/api/product/[singleProductId]/route');
+    POST = mod.POST;
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    dbConnect.mockResolvedValue(undefined);
+  });
+
+  function createPostRequest(url, body) {
+    return new Request(url, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+  }
+
+  it('adds a review with name, rating, and comment', async () => {
+    const productToReview = {
+      ...mockProducts[0],
+      reviews: [],
+      ratings: 0,
+      save: jest.fn().mockResolvedValue(true),
+    };
+
+    Product.findById.mockResolvedValue(productToReview);
+
+    const req = createPostRequest('http://localhost:3000/api/product/prod_1', {
+      name: 'Gusti',
+      rating: 5,
+      comment: 'Great product',
+    });
+
+    const res = await POST(req, {
+      params: {
+        singleProductId: 'prod_1',
+      },
+    });
+
+    const body = await res.json();
+
+    expect(dbConnect).toHaveBeenCalledTimes(1);
+    expect(Product.findById).toHaveBeenCalledTimes(2);
+    expect(Product.findById).toHaveBeenCalledWith('prod_1');
+
+    expect(productToReview.reviews).toHaveLength(1);
+    expect(productToReview.reviews[0].name).toBe('Gusti');
+    expect(productToReview.reviews[0].rating).toBe(5);
+    expect(productToReview.reviews[0].comment).toBe('Great product');
+
+    expect(productToReview.ratings).toBe(5);
+    expect(productToReview.save).toHaveBeenCalledTimes(1);
+
+    expect(res.status).toBe(201);
+    expect(body.success).toBe(true);
+    expect(body.message).toBe('Review added successfully');
+    expect(body.reviews).toHaveLength(1);
+    expect(body.reviews[0].name).toBe('Gusti');
+    expect(body.ratings).toBe(5);
+  });
+
+  it('uses Anonymous when name is empty', async () => {
+    const productToReview = {
+      ...mockProducts[0],
+      reviews: [],
+      ratings: 0,
+      save: jest.fn().mockResolvedValue(true),
+    };
+
+    Product.findById.mockResolvedValue(productToReview);
+
+    const req = createPostRequest('http://localhost:3000/api/product/prod_1', {
+      name: '',
+      rating: 4,
+      comment: 'Nice product',
+    });
+
+    const res = await POST(req, {
+      params: {
+        singleProductId: 'prod_1',
+      },
+    });
+
+    const body = await res.json();
+
+    expect(res.status).toBe(201);
+    expect(body.success).toBe(true);
+    expect(productToReview.reviews[0].name).toBe('Anonymous');
+    expect(body.reviews[0].name).toBe('Anonymous');
+  });
+
+  it('returns 404 when product is not found while adding review', async () => {
+    Product.findById.mockResolvedValue(null);
+
+    const req = createPostRequest('http://localhost:3000/api/product/nonexistent', {
+      name: 'Gusti',
+      rating: 5,
+      comment: 'Great product',
+    });
+
+    const res = await POST(req, {
+      params: {
+        singleProductId: 'nonexistent',
+      },
+    });
+
+    const body = await res.json();
+
+    expect(res.status).toBe(404);
+    expect(body.success).toBe(false);
+    expect(body.message).toBe('Product not found');
+  });
+
+  it('returns 400 when rating is invalid', async () => {
+    const productToReview = {
+      ...mockProducts[0],
+      reviews: [],
+      ratings: 0,
+      save: jest.fn().mockResolvedValue(true),
+    };
+
+    Product.findById.mockResolvedValue(productToReview);
+
+    const req = createPostRequest('http://localhost:3000/api/product/prod_1', {
+      name: 'Gusti',
+      rating: 6,
+      comment: 'Great product',
+    });
+
+    const res = await POST(req, {
+      params: {
+        singleProductId: 'prod_1',
+      },
+    });
+
+    const body = await res.json();
+
+    expect(res.status).toBe(400);
+    expect(body.success).toBe(false);
+    expect(body.message).toBe('Rating must be between 1 and 5');
+    expect(productToReview.save).not.toHaveBeenCalled();
+  });
+
+  it('returns 400 when comment is empty', async () => {
+    const productToReview = {
+      ...mockProducts[0],
+      reviews: [],
+      ratings: 0,
+      save: jest.fn().mockResolvedValue(true),
+    };
+
+    Product.findById.mockResolvedValue(productToReview);
+
+    const req = createPostRequest('http://localhost:3000/api/product/prod_1', {
+      name: 'Gusti',
+      rating: 5,
+      comment: '',
+    });
+
+    const res = await POST(req, {
+      params: {
+        singleProductId: 'prod_1',
+      },
+    });
+
+    const body = await res.json();
+
+    expect(res.status).toBe(400);
+    expect(body.success).toBe(false);
+    expect(body.message).toBe('Comment is required');
+    expect(productToReview.save).not.toHaveBeenCalled();
+  });
+
+  it('returns 502 when adding review throws an error', async () => {
+    Product.findById.mockRejectedValue(new Error('Review failed'));
+
+    const req = createPostRequest('http://localhost:3000/api/product/prod_1', {
+      name: 'Gusti',
+      rating: 5,
+      comment: 'Great product',
+    });
+
+    const res = await POST(req, {
+      params: {
+        singleProductId: 'prod_1',
+      },
+    });
+
+    const body = await res.json();
+
+    expect(res.status).toBe(502);
+    expect(body.error).toBe('Review failed');
   });
 });
