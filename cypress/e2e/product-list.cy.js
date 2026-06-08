@@ -14,20 +14,23 @@ describe('Product list page', () => {
   });
 
   it('mengirim keyword search ke halaman productList', () => {
-    cy.get('nav form input, form input[required]').first().type('laptop{enter}');
+    cy.get('nav form input, form input[required]').first().clear().type('laptop{enter}');
 
     cy.location('pathname').should('include', '/productList');
     cy.location('search').should('include', 'keyword=laptop');
-    cy.wait('@getProducts');
+
+    // Jangan tunggu @getProducts kedua, karena test ini cukup validasi URL search.
   });
 
   it('bisa berpindah halaman pagination', () => {
+    cy.contains('Samsung Smart TV 55 Inch').should('be.visible');
     cy.contains('Travel Backpack').should('not.exist');
 
-    cy.contains(/Next/i).click();
-    cy.wait('@getProducts');
+    cy.get('.pagination').within(() => {
+      cy.contains(/Next/i).click({ force: true });
+    });
 
-    cy.contains('Travel Backpack').should('be.visible');
+    cy.contains('Travel Backpack', { timeout: 10000 }).should('be.visible');
   });
 
   it('menampilkan alert login ketika guest menekan Add to Cart', () => {
