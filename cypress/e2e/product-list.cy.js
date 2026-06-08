@@ -25,13 +25,14 @@ describe('Product list page', () => {
     cy.contains('Samsung Smart TV 55 Inch').should('be.visible');
     cy.contains('Travel Backpack').should('not.exist');
 
-    cy.get('.pagination').within(() => {
-      cy.contains(/Next/i).click({ force: true });
+    cy.get('.pagination').contains(/Next/i).click({ force: true });
+
+    cy.wait('@getProductsPage2').then((interception) => {
+      expect(interception.response.statusCode).to.equal(200);
+      expect(interception.response.body.products[0].name).to.equal('Travel Backpack');
     });
 
-    cy.wait('@getProductsPage2').its('request.url').should('include', 'page=2');
-
-    cy.contains('Travel Backpack', { timeout: 10000 }).should('be.visible');
+    cy.get('main', { timeout: 10000 }).should('contain.text', 'Travel Backpack');
   });
 
   it('menampilkan alert login ketika guest menekan Add to Cart', () => {
