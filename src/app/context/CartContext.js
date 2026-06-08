@@ -1,27 +1,15 @@
 'use client';
 
 import { createContext, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import { useFirebaseAppContext } from './FirebaseContext';
 
-const CartContext = createContext({
-  cart: { cartItems: [] },
-  addItemToCart: async () => {},
-  deleteItemFromCart: async () => {},
-  clearCart: async () => {},
-});
+const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const { user, loading } = useFirebaseAppContext();
-
   const [cart, setCart] = useState({ cartItems: [] });
-
-  const normalizeCart = (cartData) => {
-    return {
-      ...cartData,
-      cartItems: Array.isArray(cartData?.cartItems) ? cartData.cartItems : [],
-    };
-  };
 
   const getAuthToken = async () => {
     if (!user) return null;
@@ -29,126 +17,67 @@ export const CartProvider = ({ children }) => {
   };
 
   const fetchCart = async () => {
-    try {
-      const token = await getAuthToken();
-
-      if (!token) {
-        setCart({ cartItems: [] });
-        return;
-      }
-
-      const res = await fetch('/api/cart', {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) {
-        setCart({ cartItems: [] });
-        return;
-      }
-
-      const data = await res.json();
-      setCart(normalizeCart(data.cart));
-    } catch (error) {
-      setCart({ cartItems: [] });
-    }
+    const token = await getAuthToken();
+    if (!token) { setCart({ cartItems: [] }); return; }
+    const res = await fetch('/api/cart', {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) { setCart({ cartItems: [] }); return; }
+    const data = await res.json();
+    setCart(data.cart || { cartItems: [] });
   };
 
   useEffect(() => {
-    if (!loading) {
-      fetchCart();
-    }
+    if (!loading) fetchCart();
   }, [user, loading]);
 
   const addItemToCart = async ({ product, name, price, image, stock, seller, quantity = 1 }) => {
     const token = await getAuthToken();
-
     if (!token) {
-      alert('Please login first');
+      toast.warn('Silakan login terlebih dahulu! 🔒');
       return;
     }
-
-    const item = {
-      product,
-      name,
-      price,
-      image,
-      stock,
-      seller,
-      quantity,
-    };
-
+    const item = { product, name, price, image, stock, seller, quantity };
     const res = await fetch('/api/cart', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify(item),
     });
-
-    if (!res.ok) {
-      alert('Failed to update cart');
-      return;
-    }
-
+    if (!res.ok) { toast.error('Gagal menambahkan ke cart'); return; }
     const data = await res.json();
-    setCart(normalizeCart(data.cart));
+    setCart(data.cart);
+    toast.success(`${name} ditambahkan ke cart! 🛒`);
   };
 
   const deleteItemFromCart = async (id) => {
     const token = await getAuthToken();
-
     if (!token) return;
-
     const res = await fetch(`/api/cart?product=${id}`, {
       method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
-
-    if (!res.ok) {
-      alert('Failed to remove item from cart');
-      return;
-    }
-
+    if (!res.ok) { toast.error('Gagal menghapus item'); return; }
     const data = await res.json();
-    setCart(normalizeCart(data.cart));
+    setCart(data.cart);
+    toast.info('Item dihapus dari cart');
   };
 
   const clearCart = async () => {
     const token = await getAuthToken();
-
     if (!token) return;
-
     const res = await fetch('/api/cart', {
       method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
-
-    if (!res.ok) {
-      alert('Failed to clear cart');
-      return;
-    }
-
+    if (!res.ok) { toast.error('Gagal mengosongkan cart'); return; }
     const data = await res.json();
-    setCart(normalizeCart(data.cart));
+    setCart(data.cart);
+    toast.info('Cart dikosongkan');
   };
 
   return (
-    <CartContext.Provider
-      value={{
-        cart,
-        addItemToCart,
-        deleteItemFromCart,
-        clearCart,
-      }}
-    >
+    <CartContext.Provider value={{ cart, addItemToCart, deleteItemFromCart, clearCart }}>
       {children}
     </CartContext.Provider>
   );

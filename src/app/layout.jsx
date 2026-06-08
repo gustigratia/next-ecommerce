@@ -1,10 +1,14 @@
 import { Poppins } from 'next/font/google';
 import Script from 'next/script';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
+import BackToTop from './components/BackToTop';
 import Footer from './components/footer/Footer';
 import NavBar from './components/nav/NavBar';
 import { CartProvider } from './context/CartContext';
 import FirebaseContextProvider from './context/FirebaseContext';
+import { WishlistProvider } from './context/WishlistContext';
 import './globals.css';
 
 const poppins = Poppins({ subsets: ['latin'], weight: ['400', '700'] });
@@ -20,11 +24,23 @@ export default function RootLayout({ children }) {
       <body className={`${poppins.className} text-slate-700`}>
         <FirebaseContextProvider>
           <CartProvider>
-            <div className="flex flex-col min-h-screen">
-              <NavBar />
-              <main className="flex-grow">{children}</main>
-              <Footer />
-            </div>
+            <WishlistProvider>
+              <div className="flex flex-col min-h-screen">
+                <NavBar />
+                <main className="flex-grow">{children}</main>
+                <Footer />
+              </div>
+              <BackToTop />
+              <ToastContainer
+                position="bottom-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                closeOnClick
+                pauseOnHover
+                draggable
+                theme="light"
+              />
+            </WishlistProvider>
           </CartProvider>
         </FirebaseContextProvider>
 
