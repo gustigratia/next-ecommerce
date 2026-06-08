@@ -112,7 +112,7 @@ export default function Home() {
             <div key={item.id} className="relative rounded-sm overflow-hidden group">
               <img src={item.imgUrl} alt="category 1" className="w-full h-full" />
               <Link
-                href={`/productList?category=${item.nameLink}`}
+                href={`/productList?category=${encodeURIComponent(item.nameLink)}`}
                 className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center text-2xl text-white font-roboto font-extrabold group-hover:bg-opacity-60 transition"
               >
                 {item.nameLink}
