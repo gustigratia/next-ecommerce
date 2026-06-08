@@ -36,7 +36,10 @@ const ProductItem = ({ product }) => {
           />
           {/* Tombol Wishlist */}
           <button
-            onClick={() => toggleWishlist(product)}
+            onClick={() => {
+              console.log('💛 Wishlist button clicked, product:', product);
+              toggleWishlist(product);
+            }}
             className="absolute top-4 right-4 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200"
             aria-label={inWishlist ? 'Hapus dari wishlist' : 'Tambah ke wishlist'}
           >

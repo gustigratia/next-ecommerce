@@ -47,9 +47,9 @@ const NavBar = () => {
               >
                 <i className="fa fa-heart"></i>
                 <span className="hidden lg:inline">Wishlist</span>
-                {wishlist.length > 0 && (
+                {wishlist.wishlistItems.length > 0 && (
                   <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center font-bold leading-none">
-                    {wishlist.length}
+                    {wishlist.wishlistItems.length}
                   </span>
                 )}
               </Link>
@@ -119,9 +119,9 @@ const NavBar = () => {
               <i className="fa fa-heart text-red-300 w-4"></i>
               Wishlist
             </span>
-            {wishlist.length > 0 && (
+            {wishlist.wishlistItems.length > 0 && (
               <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                {wishlist.length}
+                {wishlist.wishlistItems.length}
               </span>
             )}
           </Link>

@@ -3,53 +3,133 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
+import { useFirebaseAppContext } from './FirebaseContext';
+
 const WishlistContext = createContext();
 
 export const WishlistProvider = ({ children }) => {
-  const [wishlist, setWishlist] = useState([]);
+  const { user, loading } = useFirebaseAppContext();
+  const [wishlist, setWishlist] = useState({ wishlistItems: [] });
 
-  // Load dari localStorage saat pertama kali
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('wishlist');
-      if (stored) setWishlist(JSON.parse(stored));
-    } catch {
-      setWishlist([]);
+  const getAuthToken = async () => {
+    if (!user) return null;
+    return user.getIdToken();
+  };
+
+  const fetchWishlist = async () => {
+    const token = await getAuthToken();
+    if (!token) {
+      setWishlist({ wishlistItems: [] });
+      return;
     }
-  }, []);
-
-  // Simpan ke localStorage setiap kali wishlist berubah
-  useEffect(() => {
-    localStorage.setItem('wishlist', JSON.stringify(wishlist));
-  }, [wishlist]);
-
-  const addToWishlist = (product) => {
-    const exists = wishlist.find((item) => item._id === product._id);
-    if (exists) {
-        toast.info(`${product.name} sudah ada di wishlist`);
-        return;
+    const res = await fetch('/api/wishlist', {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      setWishlist({ wishlistItems: [] });
+      return;
     }
-    setWishlist((prev) => [...prev, product]); // ✅ setState murni, tanpa side effect
+    const data = await res.json();
+    console.log('📦 Wishlist data dari API:', JSON.stringify(data, null, 2));
+    setWishlist(data.wishlist || { wishlistItems: [] });
+  };
+
+  useEffect(() => {
+    if (!loading) fetchWishlist();
+  }, [user, loading]);
+
+  const addToWishlist = async (product) => {
+    const token = await getAuthToken();
+    if (!token) {
+      toast.warn('Silakan login terlebih dahulu! 🔒');
+      return;
+    }
+
+    const item = { 
+      product: product._id, 
+      name: product.name, 
+      price: product.price, 
+      imageUrl: product?.images?.[0]?.url || '', 
+      ratings: product.ratings || 0,
+      stock: product.stock,
+      seller: product.seller 
+    };
+
+    console.log('📤 Mengirim ke wishlist API:', JSON.stringify(item, null, 2));
+
+    const res = await fetch('/api/wishlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(item),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      console.error('❌ Error response:', errorData);
+      toast.error(`Gagal menambahkan ke wishlist: ${errorData.error || res.statusText}`);
+      return;
+    }
+
+    const data = await res.json();
+    console.log('📥 Response dari wishlist API:', JSON.stringify(data, null, 2));
+    setWishlist(data.wishlist);
     toast.success(`${product.name} ditambahkan ke wishlist ❤️`);
   };
 
-  const removeFromWishlist = (productId) => {
-    setWishlist((prev) => prev.filter((item) => item._id !== productId));
+  const removeFromWishlist = async (productId) => {
+    const token = await getAuthToken();
+    if (!token) return;
+
+    const res = await fetch(`/api/wishlist?product=${productId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      toast.error('Gagal menghapus dari wishlist');
+      return;
+    }
+
+    const data = await res.json();
+    setWishlist(data.wishlist);
     toast.info('Dihapus dari wishlist');
   };
 
-  const isInWishlist = (productId) => wishlist.some((item) => item._id === productId);
+  const isInWishlist = (productId) =>
+    wishlist.wishlistItems.some((item) => item.product === productId);
 
-  const toggleWishlist = (product) => {
+  const toggleWishlist = async (product) => {
     if (isInWishlist(product._id)) {
-      removeFromWishlist(product._id);
+      await removeFromWishlist(product._id);
     } else {
-      addToWishlist(product);
+      await addToWishlist(product);
     }
   };
 
+  const clearWishlist = async () => {
+    const token = await getAuthToken();
+    if (!token) return;
+
+    const res = await fetch('/api/wishlist', {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      toast.error('Gagal mengosongkan wishlist');
+      return;
+    }
+
+    const data = await res.json();
+    setWishlist(data.wishlist);
+    toast.info('Wishlist dikosongkan');
+  };
+
   return (
-    <WishlistContext.Provider value={{ wishlist, addToWishlist, removeFromWishlist, isInWishlist, toggleWishlist }}>
+    <WishlistContext.Provider
+      value={{ wishlist, addToWishlist, removeFromWishlist, isInWishlist, toggleWishlist, clearWishlist }}
+    >
       {children}
     </WishlistContext.Provider>
   );
