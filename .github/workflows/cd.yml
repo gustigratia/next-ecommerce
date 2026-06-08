@@ -1,4 +1,4 @@
-name: CD - Build and Deploy to GCP
+name: CD - Build, Test Staging, and Deploy to GCP
 
 on:
   workflow_run:
@@ -20,6 +20,7 @@ jobs:
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
+    environment: staging
 
     permissions:
       contents: read
@@ -93,12 +94,68 @@ jobs:
             --format="value(status.url)")
 
           echo "staging_url=$STAGING_URL" >> "$GITHUB_OUTPUT"
-          echo "Service URL: $STAGING_URL"
+          echo "Staging URL: $STAGING_URL"
+
+  e2e-staging:
+    name: Run Cypress E2E on Staging
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    environment: staging
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    env:
+      CYPRESS_BASE_URL: ${{ needs.deploy-staging.outputs.service_url }}
+      CYPRESS_TEST_EMAIL: testing-cy@example.com
+      CYPRESS_TEST_PASSWORD: ${{ secrets.CYPRESS_TEST_PASSWORD }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install correct npm version
+        run: npm install -g npm@11.6.2
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Wait for staging app
+        run: |
+          echo "Checking staging URL: $CYPRESS_BASE_URL"
+          curl --fail --retry 12 --retry-all-errors --retry-delay 10 "$CYPRESS_BASE_URL"
+
+      - name: Run Cypress E2E against staging
+        run: npm run cy:run -- --browser chrome --config baseUrl=$CYPRESS_BASE_URL
+
+      - name: Upload Cypress screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots-staging
+          path: cypress/screenshots
+
+      - name: Upload Cypress videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-videos-staging
+          path: cypress/videos
 
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: deploy-staging
+    needs:
+      - deploy-staging
+      - e2e-staging
+    environment: production
 
     permissions:
       contents: read
@@ -120,7 +177,7 @@ jobs:
         with:
           service: ${{ env.SERVICE_NAME }}
           region: ${{ env.REGION }}
-          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.event.workflow_run.head_sha }}
+          image: ${{ needs.deploy-staging.outputs.image }}
           flags: --allow-unauthenticated
           env_vars: |-
             NODE_ENV=production
@@ -135,7 +192,7 @@ jobs:
             NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
             NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
 
-      - name: Show service URL
+      - name: Show production service URL
         run: |
           gcloud run services describe ${{ env.SERVICE_NAME }} \
             --region ${{ env.REGION }} \
