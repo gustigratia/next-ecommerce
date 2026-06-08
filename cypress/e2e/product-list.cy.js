@@ -2,7 +2,8 @@ describe('Product list page', () => {
   beforeEach(() => {
     cy.mockProductListApi();
     cy.visit('/productList');
-    cy.wait('@getProducts');
+    cy.wait('@getProductsPage1');
+    cy.contains('Samsung Smart TV 55 Inch').should('be.visible');
   });
 
   it('menampilkan daftar produk dari API', () => {
@@ -18,8 +19,6 @@ describe('Product list page', () => {
 
     cy.location('pathname').should('include', '/productList');
     cy.location('search').should('include', 'keyword=laptop');
-
-    // Jangan tunggu @getProducts kedua, karena test ini cukup validasi URL search.
   });
 
   it('bisa berpindah halaman pagination', () => {
@@ -29,6 +28,8 @@ describe('Product list page', () => {
     cy.get('.pagination').within(() => {
       cy.contains(/Next/i).click({ force: true });
     });
+
+    cy.wait('@getProductsPage2').its('request.url').should('include', 'page=2');
 
     cy.contains('Travel Backpack', { timeout: 10000 }).should('be.visible');
   });
