@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 
 import dbConnect from "@/backend/config/dbConnect";
 import Order from "@/backend/models/order";
+<<<<<<< HEAD
 import admin from "@/backend/config/firebaseAdmin";
+=======
+import { adminAuth } from "@/backend/config/firebaseAdmin";
+>>>>>>> 09fecdc66ae8333a4f4abada9a6b38e0d886b9b1
 
 const getUserFromRequest = async (request) => {
   const authHeader = request.headers.get("authorization");
@@ -13,7 +17,11 @@ const getUserFromRequest = async (request) => {
 
   const token = authHeader.split("Bearer ")[1];
 
+<<<<<<< HEAD
   return await await admin.auth().verifyIdToken(token);
+=======
+  return await adminAuth.verifyIdToken(token);
+>>>>>>> 09fecdc66ae8333a4f4abada9a6b38e0d886b9b1
 };
 
 export async function POST(request) {
