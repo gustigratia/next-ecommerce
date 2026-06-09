@@ -28,8 +28,6 @@ export async function GET(req) {
 
     const wishlist = await Wishlist.findOne({ userId: user.uid });
 
-    console.log('📊 Wishlist ditemukan di DB:', JSON.stringify(wishlist?.items || [], null, 2));
-
     return NextResponse.json(
       {
         wishlist: {
@@ -39,8 +37,12 @@ export async function GET(req) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('❌ Error di GET wishlist:', error);
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    console.error('Failed to retrieve wishlist:', error);
+
+    return NextResponse.json(
+      { error: error.message || 'Failed to retrieve wishlist' },
+      { status: error.message === 'Unauthorized' ? 401 : 500 }
+    );
   }
 }
 
@@ -51,17 +53,27 @@ export async function POST(req) {
     const user = await getUserFromRequest(req);
     const item = await req.json();
 
-    console.log('📨 API menerima item:', JSON.stringify(item, null, 2));
+    if (!item?.product) {
+      return NextResponse.json({ error: 'Product information is required' }, { status: 400 });
+    }
 
     let wishlist = await Wishlist.findOne({ userId: user.uid });
 
     if (!wishlist) {
       wishlist = await Wishlist.create({
         userId: user.uid,
-        items: [item],
+        items: [
+          {
+            product: item.product,
+            name: item.name,
+            price: item.price,
+            imageUrl: item.imageUrl || '',
+            ratings: item.ratings || 0,
+            seller: item.seller,
+            stock: item.stock,
+          },
+        ],
       });
-
-      console.log('✅ Wishlist baru dibuat, items:', JSON.stringify(wishlist.items, null, 2));
 
       return NextResponse.json(
         {
@@ -73,12 +85,11 @@ export async function POST(req) {
       );
     }
 
-    const itemIndex = wishlist.items.findIndex(
-      (wishlistItem) => wishlistItem.product === item.product
+    const itemExists = wishlist.items.some(
+      (wishlistItem) => String(wishlistItem.product) === String(item.product)
     );
 
-    if (itemIndex > -1) {
-      console.log('ℹ️ Item sudah ada di wishlist');
+    if (itemExists) {
       return NextResponse.json(
         {
           wishlist: {
@@ -89,7 +100,6 @@ export async function POST(req) {
       );
     }
 
-    // Explicitly set all fields
     wishlist.items.push({
       product: item.product,
       name: item.name,
@@ -102,8 +112,6 @@ export async function POST(req) {
 
     await wishlist.save();
 
-    console.log('✅ Item ditambahkan, sekarang items memiliki:', JSON.stringify(wishlist.items[wishlist.items.length - 1], null, 2));
-
     return NextResponse.json(
       {
         wishlist: {
@@ -113,10 +121,11 @@ export async function POST(req) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('❌ Error di wishlist API POST:', error.message, error.stack);
+    console.error('Failed to update wishlist:', error);
+
     return NextResponse.json(
-      { error: error.message || 'Internal Server Error' },
-      { status: 500 }
+      { error: error.message || 'Failed to update wishlist' },
+      { status: error.message === 'Unauthorized' ? 401 : 500 }
     );
   }
 }
@@ -144,7 +153,7 @@ export async function DELETE(req) {
     }
 
     if (productId) {
-      wishlist.items = wishlist.items.filter((item) => item.product !== productId);
+      wishlist.items = wishlist.items.filter((item) => String(item.product) !== String(productId));
     } else {
       wishlist.items = [];
     }
@@ -160,9 +169,11 @@ export async function DELETE(req) {
       { status: 200 }
     );
   } catch (error) {
+    console.error('Failed to remove wishlist item:', error);
+
     return NextResponse.json(
-      { error: error.message || 'Internal Server Error' },
-      { status: 500 }
+      { error: error.message || 'Failed to remove wishlist item' },
+      { status: error.message === 'Unauthorized' ? 401 : 500 }
     );
   }
 }

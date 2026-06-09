@@ -1,54 +1,31 @@
-/**
- * Search Component provides a search input and button for searching products.
- * It utilizes Next.js useRouter for navigation.
- * @returns {JSX.Element} - Rendered component for searching products.
- */
 'use client';
 
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
-
-/**
- * Search Component provides a search input and button for searching products.
- * It utilizes Next.js useRouter for navigation.
- * @returns {JSX.Element} - Rendered component for searching products.
- */
-
-/**
- * Search Component provides a search input and button for searching products.
- * It utilizes Next.js useRouter for navigation.
- * @returns {JSX.Element} - Rendered component for searching products.
- */
-
-/**
- * Search Component provides a search input and button for searching products.
- * It utilizes Next.js useRouter for navigation.
- * @returns {JSX.Element} - Rendered component for searching products.
- */
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
 const Search = () => {
-  // State to manage the search keyword
-  const [keyword, setKeyword] = useState('');
-  // Next.js useRouter hook for navigation
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  /**
-   * Handles the form submission, redirects to the search page with the entered keyword.
-   * If the keyword is empty, redirects to the home page.
-   * @param {Event} e - Form submission event.
-   */
+  const currentKeyword = searchParams.get('keyword') || '';
+  const [keyword, setKeyword] = useState(currentKeyword);
+
+  useEffect(() => {
+    setKeyword(currentKeyword);
+  }, [currentKeyword]);
 
   const submitHandler = (e) => {
     e.preventDefault();
-    if (keyword) {
-      router.push(`/productList/?keyword=${keyword}`);
+
+    const trimmedKeyword = keyword.trim();
+
+    if (trimmedKeyword) {
+      router.push(`/productList?keyword=${encodeURIComponent(trimmedKeyword)}`);
     } else {
-      router.push('/');
+      router.push('/productList');
     }
-    setKeyword('');
   };
 
-  // Render the search form
   return (
     <form
       className="flex flex-nowrap items-center w-full order-last md:order-none mt-5 md:mt-0 md:w-2/4 lg:w-2/4"
@@ -60,8 +37,8 @@ const Search = () => {
         placeholder="Search for products..."
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
-        required
       />
+
       <button
         type="submit"
         className="px-4 py-2 inline-block border border-transparent bg-yellow-600 text-white rounded-e-lg hover:bg-yellow-800"

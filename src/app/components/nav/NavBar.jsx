@@ -17,6 +17,7 @@ const NavBar = () => {
   const { cart } = useContext(CartContext);
   const { wishlist } = useWishlist();
   const cartItems = cart?.cartItems;
+  const cartItemCount = cartItems?.length || 0;
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -24,7 +25,6 @@ const NavBar = () => {
       <div className="py-2 border-b border-red-900">
         <Container>
           <div className="flex items-center justify-between gap-3 md:gap-0">
-
             {/* Logo */}
             <Link href="/" onClick={() => setMenuOpen(false)}>
               <div className="max-h-[55px] overflow-hidden flex justify-center items-center">
@@ -39,7 +39,6 @@ const NavBar = () => {
 
             {/* Tombol-tombol — desktop */}
             <div className="hidden md:flex items-center gap-2">
-
               {/* Wishlist */}
               <Link
                 href="/wishlist"
@@ -60,10 +59,11 @@ const NavBar = () => {
                 className="relative px-3 py-2 inline-flex items-center gap-1.5 text-yellow-600 bg-white shadow-sm border border-gray-200 rounded-md hover:bg-gray-50 transition text-sm"
               >
                 <i className="fa fa-shopping-cart"></i>
-                <span className="hidden lg:inline">Cart ({cartItems?.length || 0})</span>
-                {cartItems?.length > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center font-bold leading-none">
-                    {cartItems.length}
+                <span className="hidden lg:inline">Cart</span>
+
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-xs min-w-4 h-4 px-1 rounded-full flex items-center justify-center font-bold leading-none">
+                    {cartItemCount}
                   </span>
                 )}
               </Link>
@@ -135,9 +135,11 @@ const NavBar = () => {
               <i className="fa fa-shopping-cart text-yellow-300 w-4"></i>
               Cart
             </span>
-            <span className="bg-yellow-600 text-white text-xs px-2 py-0.5 rounded-full">
-              {cartItems?.length || 0}
-            </span>
+            {cartItemCount > 0 && (
+              <span className="bg-yellow-600 text-white text-xs px-2 py-0.5 rounded-full">
+                {cartItemCount}
+              </span>
+            )}
           </Link>
 
           {user ? (

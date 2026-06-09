@@ -1,139 +1,210 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { useFirebaseAppContext } from './FirebaseContext';
 
-const WishlistContext = createContext();
+const WishlistContext = createContext(null);
+
+const DEFAULT_WISHLIST = {
+  wishlistItems: [],
+};
 
 export const WishlistProvider = ({ children }) => {
   const { user, loading } = useFirebaseAppContext();
-  const [wishlist, setWishlist] = useState({ wishlistItems: [] });
+  const [wishlist, setWishlist] = useState(DEFAULT_WISHLIST);
 
-  const getAuthToken = async () => {
+  const getAuthToken = useCallback(async () => {
     if (!user) return null;
-    return user.getIdToken();
-  };
 
-  const fetchWishlist = async () => {
-    const token = await getAuthToken();
-    if (!token) {
-      setWishlist({ wishlistItems: [] });
-      return;
+    return user.getIdToken();
+  }, [user]);
+
+  const fetchWishlist = useCallback(async () => {
+    try {
+      const token = await getAuthToken();
+
+      if (!token) {
+        setWishlist(DEFAULT_WISHLIST);
+        return;
+      }
+
+      const res = await fetch('/api/wishlist', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        setWishlist(DEFAULT_WISHLIST);
+        return;
+      }
+
+      const data = await res.json();
+
+      setWishlist(data.wishlist || DEFAULT_WISHLIST);
+    } catch (error) {
+      console.error('Failed to fetch wishlist:', error);
+      setWishlist(DEFAULT_WISHLIST);
     }
-    const res = await fetch('/api/wishlist', {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) {
-      setWishlist({ wishlistItems: [] });
-      return;
-    }
-    const data = await res.json();
-    console.log('📦 Wishlist data dari API:', JSON.stringify(data, null, 2));
-    setWishlist(data.wishlist || { wishlistItems: [] });
-  };
+  }, [getAuthToken]);
 
   useEffect(() => {
-    if (!loading) fetchWishlist();
-  }, [user, loading]);
-
-  const addToWishlist = async (product) => {
-    const token = await getAuthToken();
-    if (!token) {
-      toast.warn('Silakan login terlebih dahulu! 🔒');
-      return;
+    if (!loading) {
+      fetchWishlist();
     }
+  }, [loading, fetchWishlist]);
 
-    const item = { 
-      product: product._id, 
-      name: product.name, 
-      price: product.price, 
-      imageUrl: product?.images?.[0]?.url || '', 
-      ratings: product.ratings || 0,
-      stock: product.stock,
-      seller: product.seller 
-    };
+  const addToWishlist = useCallback(
+    async (product) => {
+      try {
+        const token = await getAuthToken();
 
-    console.log('📤 Mengirim ke wishlist API:', JSON.stringify(item, null, 2));
+        if (!token) {
+          toast.warn('Please sign in to add items to your wishlist.');
+          return;
+        }
 
-    const res = await fetch('/api/wishlist', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify(item),
-    });
+        const item = {
+          product: product._id,
+          name: product.name,
+          price: product.price,
+          imageUrl: product?.images?.[0]?.url || '',
+          ratings: product.ratings || 0,
+          stock: product.stock,
+          seller: product.seller,
+        };
 
-    if (!res.ok) {
-      const errorData = await res.json();
-      console.error('❌ Error response:', errorData);
-      toast.error(`Gagal menambahkan ke wishlist: ${errorData.error || res.statusText}`);
-      return;
-    }
+        const res = await fetch('/api/wishlist', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(item),
+        });
 
-    const data = await res.json();
-    console.log('📥 Response dari wishlist API:', JSON.stringify(data, null, 2));
-    setWishlist(data.wishlist);
-    toast.success(`${product.name} ditambahkan ke wishlist ❤️`);
-  };
+        if (!res.ok) {
+          const errorData = await res.json();
 
-  const removeFromWishlist = async (productId) => {
-    const token = await getAuthToken();
-    if (!token) return;
+          toast.error(`Failed to add item to wishlist: ${errorData.error || res.statusText}`);
 
-    const res = await fetch(`/api/wishlist?product=${productId}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
-    });
+          return;
+        }
 
-    if (!res.ok) {
-      toast.error('Gagal menghapus dari wishlist');
-      return;
-    }
+        const data = await res.json();
 
-    const data = await res.json();
-    setWishlist(data.wishlist);
-    toast.info('Dihapus dari wishlist');
-  };
-
-  const isInWishlist = (productId) =>
-    wishlist.wishlistItems.some((item) => item.product === productId);
-
-  const toggleWishlist = async (product) => {
-    if (isInWishlist(product._id)) {
-      await removeFromWishlist(product._id);
-    } else {
-      await addToWishlist(product);
-    }
-  };
-
-  const clearWishlist = async () => {
-    const token = await getAuthToken();
-    if (!token) return;
-
-    const res = await fetch('/api/wishlist', {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!res.ok) {
-      toast.error('Gagal mengosongkan wishlist');
-      return;
-    }
-
-    const data = await res.json();
-    setWishlist(data.wishlist);
-    toast.info('Wishlist dikosongkan');
-  };
-
-  return (
-    <WishlistContext.Provider
-      value={{ wishlist, addToWishlist, removeFromWishlist, isInWishlist, toggleWishlist, clearWishlist }}
-    >
-      {children}
-    </WishlistContext.Provider>
+        setWishlist(data.wishlist || DEFAULT_WISHLIST);
+        toast.success(`${product.name} has been added to your wishlist.`);
+      } catch (error) {
+        console.error('Failed to add item to wishlist:', error);
+        toast.error('An error occurred while adding the item to your wishlist.');
+      }
+    },
+    [getAuthToken]
   );
+
+  const removeFromWishlist = useCallback(
+    async (productId) => {
+      try {
+        const token = await getAuthToken();
+
+        if (!token) return;
+
+        const res = await fetch(`/api/wishlist?product=${productId}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          toast.error('Failed to remove item from wishlist.');
+          return;
+        }
+
+        const data = await res.json();
+
+        setWishlist(data.wishlist || DEFAULT_WISHLIST);
+        toast.info('Item removed from wishlist.');
+      } catch (error) {
+        console.error('Failed to remove item from wishlist:', error);
+        toast.error('An error occurred while removing the item from your wishlist.');
+      }
+    },
+    [getAuthToken]
+  );
+
+  const isInWishlist = useCallback(
+    (productId) =>
+      wishlist.wishlistItems.some((item) => String(item.product) === String(productId)),
+    [wishlist.wishlistItems]
+  );
+
+  const toggleWishlist = useCallback(
+    async (product) => {
+      if (isInWishlist(product._id)) {
+        await removeFromWishlist(product._id);
+      } else {
+        await addToWishlist(product);
+      }
+    },
+    [isInWishlist, removeFromWishlist, addToWishlist]
+  );
+
+  const clearWishlist = useCallback(async () => {
+    try {
+      const token = await getAuthToken();
+
+      if (!token) return;
+
+      const res = await fetch('/api/wishlist', {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        toast.error('Failed to clear wishlist.');
+        return;
+      }
+
+      const data = await res.json();
+
+      setWishlist(data.wishlist || DEFAULT_WISHLIST);
+      toast.info('Wishlist cleared successfully.');
+    } catch (error) {
+      console.error('Failed to clear wishlist:', error);
+      toast.error('An error occurred while clearing your wishlist.');
+    }
+  }, [getAuthToken]);
+
+  const value = useMemo(
+    () => ({
+      wishlist,
+      addToWishlist,
+      removeFromWishlist,
+      isInWishlist,
+      toggleWishlist,
+      clearWishlist,
+    }),
+    [wishlist, addToWishlist, removeFromWishlist, isInWishlist, toggleWishlist, clearWishlist]
+  );
+
+  return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;
 };
 
-export const useWishlist = () => useContext(WishlistContext);
+export const useWishlist = () => {
+  const context = useContext(WishlistContext);
+
+  if (!context) {
+    throw new Error('useWishlist must be used within a WishlistProvider');
+  }
+
+  return context;
+};
+
 export default WishlistContext;
