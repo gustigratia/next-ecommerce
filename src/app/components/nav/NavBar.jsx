@@ -12,6 +12,33 @@ import { useWishlist } from '../../context/WishlistContext';
 import Container from '../Container';
 import Search from './Search';
 
+<<<<<<< HEAD
+/**
+ * NavBar component renders the application navigation bar with the logo, search bar, cart link, and user authentication links.
+ * Utilizes Next.js Link for client-side navigation.
+ * @returns {JSX.Element} - Rendered component for the navigation bar.
+ */
+
+/**
+ * NavBar component renders the application navigation bar with the logo, search bar, cart link, and user authentication links.
+ * Utilizes Next.js Link for client-side navigation.
+ * @returns {JSX.Element} - Rendered component for the navigation bar.
+ */
+
+/**
+ * NavBar component renders the application navigation bar with the logo, search bar, cart link, and user authentication links.
+ * Utilizes Next.js Link for client-side navigation.
+ * @returns {JSX.Element} - Rendered component for the navigation bar.
+ */
+
+/**
+ * NavBar component renders the application navigation bar with the logo, search bar, cart link, and user authentication links.
+ * Utilizes Next.js Link for client-side navigation.
+ * @returns {JSX.Element} - Rendered component for the navigation bar.
+ */
+
+=======
+>>>>>>> 2861b1fc576152c58ca8124d43ae7a58c2efb556
 const NavBar = () => {
   const { user } = useFirebaseAppContext();
   const { cart } = useContext(CartContext);

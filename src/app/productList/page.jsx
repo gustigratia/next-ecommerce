@@ -85,9 +85,7 @@ const Page = () => {
 
         const response = await axios.get(`/api/product?${searchQuery}`);
         setProductData(response.data);
-      } catch (error) {
-        console.error('Error fetching product data:', error);
-      }
+      } catch (error) {}
     };
 
     fetchProductData();

@@ -3,6 +3,12 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
+/**
+ * Search Component provides a search input and button for searching products.
+ * It utilizes Next.js useRouter for navigation.
+ * @returns {JSX.Element} - Rendered component for searching products.
+ */
+
 const Search = () => {
   const router = useRouter();
   const searchParams = useSearchParams();

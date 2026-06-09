@@ -31,12 +31,18 @@ import SimilarProductCard from './SimilarProductCard';
  * @returns {JSX.Element} - Rendered component with similar product cards.
  */
 
+/**
+ * SimilarItems Component displays a section with similar products based on the product category.
+ * @param {Object[]} allProductData - Array of all product data.
+ * @param {string} productCateogary - The category of the main product for which similar items are displayed.
+ * @returns {JSX.Element} - Rendered component with similar product cards.
+ */
+
 const SimilarItems = ({ allProductData, productCateogary }) => {
   // Filter products based on the specified category
   const allRelatedProducts = allProductData.filter(
     (product) => product.category === productCateogary
   );
-  console.log(allRelatedProducts);
 
   return (
     <div className="border-t-2 border-red-100">

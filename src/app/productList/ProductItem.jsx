@@ -7,6 +7,14 @@ import StarRatings from 'react-star-ratings';
 import CartContext from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 
+/**
+ * ProductItem component is responsible for rendering an individual product in a styled card format.
+ * It displays product information such as name, image, ratings, description, price, and provides an option to add the product to the cart.
+ * @param {Object} props - Component properties.
+ * @param {Object} props.product - Object containing details of the product to be displayed.
+ * @returns {JSX.Element} - Rendered ProductItem component.
+ */
+
 const ProductItem = ({ product }) => {
   const { addItemToCart } = useContext(CartContext);
   const { isInWishlist, toggleWishlist } = useWishlist();
