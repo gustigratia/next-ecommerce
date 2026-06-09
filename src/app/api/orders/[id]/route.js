@@ -1,17 +1,17 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
-import dbConnect from '@/backend/config/dbConnect';
-import { verifyIdToken } from '@/backend/config/firebaseAdmin';
-import Order from '@/backend/models/order';
+import dbConnect from "@/backend/config/dbConnect";
+import Order from "@/backend/models/order";
+import { verifyIdToken } from "@/backend/config/firebaseAdmin";
 
 const getUserFromRequest = async (request) => {
-  const authHeader = request.headers.get('authorization');
+  const authHeader = request.headers.get("authorization");
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return null;
   }
 
-  const token = authHeader.split('Bearer ')[1];
+  const token = authHeader.split("Bearer ")[1];
 
   return await verifyIdToken(token);
 };
@@ -23,7 +23,10 @@ export async function GET(request, { params }) {
     const decodedToken = await getUserFromRequest(request);
 
     if (!decodedToken) {
-      return NextResponse.json({ message: 'Unauthorized. Please login first.' }, { status: 401 });
+      return NextResponse.json(
+        { message: "Unauthorized. Please login first." },
+        { status: 401 }
+      );
     }
 
     const { id } = await params;
@@ -34,11 +37,19 @@ export async function GET(request, { params }) {
     }).lean();
 
     if (!order) {
-      return NextResponse.json({ message: 'Order not found' }, { status: 404 });
+      return NextResponse.json(
+        { message: "Order not found" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({ order }, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ message: 'Failed to get order' }, { status: 500 });
+    console.error("Get order error:", error);
+
+    return NextResponse.json(
+      { message: "Failed to get order" },
+      { status: 500 }
+    );
   }
 }

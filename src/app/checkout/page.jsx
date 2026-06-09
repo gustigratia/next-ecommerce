@@ -1,6 +1,5 @@
-import React from 'react';
-
-import Checkout from './Checkout';
+import React from "react";
+import Checkout from "./Checkout";
 
 const CheckoutPage = () => {
   return <Checkout />;

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const orderItemSchema = new mongoose.Schema({
   product: {
@@ -58,7 +58,7 @@ const shippingInfoSchema = new mongoose.Schema({
 const paymentInfoSchema = new mongoose.Schema({
   method: {
     type: String,
-    enum: ['COD', 'Card'],
+    enum: ["COD", "Card"],
     required: true,
   },
   cardLast4: {
@@ -108,7 +108,7 @@ const orderSchema = new mongoose.Schema(
     },
     orderStatus: {
       type: String,
-      default: 'Processing',
+      default: "Processing",
     },
   },
   {
