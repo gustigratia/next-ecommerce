@@ -1,6 +1,6 @@
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 
 import HeroAnimation from '../app/components/hero/HeroAnimation';
 

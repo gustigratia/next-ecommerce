@@ -26,6 +26,12 @@ import React, { useState } from 'react';
  * @returns {JSX.Element} - Rendered component for searching products.
  */
 
+/**
+ * Search Component provides a search input and button for searching products.
+ * It utilizes Next.js useRouter for navigation.
+ * @returns {JSX.Element} - Rendered component for searching products.
+ */
+
 const Search = () => {
   // State to manage the search keyword
   const [keyword, setKeyword] = useState('');

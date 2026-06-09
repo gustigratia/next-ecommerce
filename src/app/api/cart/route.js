@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import dbConnect from '@/backend/config/dbConnect';
-import { verifyIdToken } from "@/backend/config/firebaseAdmin";
+import { verifyIdToken } from '@/backend/config/firebaseAdmin';
 import { Cart } from '@/backend/models/cart';
 
 export const runtime = 'nodejs';

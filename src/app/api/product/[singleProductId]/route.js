@@ -1,5 +1,5 @@
 // Import required modules for handling requests and database connection
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import dbConnect from '@/backend/config/dbConnect';
 import { Product } from '@/backend/models/product';

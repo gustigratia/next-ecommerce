@@ -34,6 +34,12 @@ import Search from './Search';
  * @returns {JSX.Element} - Rendered component for the navigation bar.
  */
 
+/**
+ * NavBar component renders the application navigation bar with the logo, search bar, cart link, and user authentication links.
+ * Utilizes Next.js Link for client-side navigation.
+ * @returns {JSX.Element} - Rendered component for the navigation bar.
+ */
+
 const NavBar = () => {
   // Retrieve user information from Firebase context
   const { user } = useFirebaseAppContext();

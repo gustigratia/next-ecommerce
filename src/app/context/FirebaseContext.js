@@ -31,7 +31,6 @@ const FirebaseContextProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(firebaseAuth, (currentUser) => {
-      console.log('Auth state changed:', currentUser);
       setUser(currentUser);
       setLoading(false);
     });
@@ -42,10 +41,8 @@ const FirebaseContextProvider = ({ children }) => {
   const signUpUserWithEmailAndPassword = async (email, password) => {
     try {
       const result = await createUserWithEmailAndPassword(firebaseAuth, email, password);
-      console.log('Sign up success:', result.user);
       return result.user;
     } catch (err) {
-      console.error('Sign up failed:', err.code, err.message);
       throw err;
     }
   };
@@ -54,10 +51,8 @@ const FirebaseContextProvider = ({ children }) => {
     try {
       const googleProvider = new GoogleAuthProvider();
       const result = await signInWithPopup(firebaseAuth, googleProvider);
-      console.log('Google sign in success:', result.user);
       return result.user;
     } catch (error) {
-      console.error('Google Sign-In Error:', error.code, error.message);
       throw error;
     }
   };
@@ -66,10 +61,8 @@ const FirebaseContextProvider = ({ children }) => {
     try {
       const facebookProvider = new FacebookAuthProvider();
       const result = await signInWithPopup(firebaseAuth, facebookProvider);
-      console.log('Facebook sign in success:', result.user);
       return result.user;
     } catch (error) {
-      console.error('Facebook Sign-In Error:', error.code, error.message);
       throw error;
     }
   };
@@ -78,10 +71,8 @@ const FirebaseContextProvider = ({ children }) => {
     try {
       const githubProvider = new GithubAuthProvider();
       const result = await signInWithPopup(firebaseAuth, githubProvider);
-      console.log('Github sign in success:', result.user);
       return result.user;
     } catch (error) {
-      console.error('Github Sign-In Error:', error.code, error.message);
       throw error;
     }
   };
@@ -90,26 +81,17 @@ const FirebaseContextProvider = ({ children }) => {
     try {
       const twitterProvider = new TwitterAuthProvider();
       const result = await signInWithPopup(firebaseAuth, twitterProvider);
-      console.log('Twitter sign in success:', result.user);
       return result.user;
     } catch (error) {
-      console.error('Twitter Sign-In Error:', error.code, error.message);
       throw error;
     }
   };
 
   const handleSignInWithEmailAndPassword = async (email, password) => {
     try {
-      console.log('Trying login with:', email);
-      console.log('Password length:', password?.length);
-
       const result = await signInWithEmailAndPassword(firebaseAuth, email, password);
-
-      console.log('Email login success:', result.user);
       return result.user;
     } catch (err) {
-      console.error('Email login failed:', err.code, err.message);
-      console.error(err);
       throw err;
     }
   };
@@ -117,9 +99,7 @@ const FirebaseContextProvider = ({ children }) => {
   const handleSignOut = async () => {
     try {
       await signOut(firebaseAuth);
-      console.log('Sign out success');
     } catch (err) {
-      console.error('Sign out failed:', err.code, err.message);
       throw err;
     }
   };

@@ -37,6 +37,14 @@ import Hero from '../components/hero/Hero';
  * @returns {JSX.Element} - Rendered Filters component.
  */
 
+/**
+ * Filters component is responsible for rendering product filters, including category selection, sorting order, and price range.
+ * It also utilizes the Hero component for displaying a hero section.
+ * @param {Object} props - Component properties.
+ * @param {JSX.Element} props.children - Children components to be rendered alongside filters.
+ * @returns {JSX.Element} - Rendered Filters component.
+ */
+
 const Filters = ({ children }) => {
   const router = useRouter();
   const searchParams = useSearchParams();

@@ -1,5 +1,5 @@
 // Import required modules for handling requests and database connection
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import { URL } from 'url';
 
@@ -119,7 +119,6 @@ export async function GET(req) {
       { status: 200 }
     );
   } catch (error) {
-    console.error(error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

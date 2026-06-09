@@ -1,4 +1,4 @@
-import OrderDetails from "./OrderDetails";
+import OrderDetails from './OrderDetails';
 
 const OrderDetailsPage = async ({ params }) => {
   const { id } = await params;

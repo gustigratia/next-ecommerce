@@ -29,6 +29,12 @@ import heroAnim from '../../style/heroAnimation.json';
  * @returns {JSX.Element} - Rendered component for displaying the Lottie animation.
  */
 
+/**
+ * HeroAnimation Component displays a Lottie animation using the Lottie React library.
+ * If there is an error loading the animation data, an error message is displayed.
+ * @returns {JSX.Element} - Rendered component for displaying the Lottie animation.
+ */
+
 const HeroAnimation = () => {
   // Check if animation data is available
   if (!heroAnim) {

@@ -33,6 +33,13 @@ import BreadCrumbs from './BreadCrumbs';
  * @returns {JSX.Element} - Rendered component with detailed product information.
  */
 
+/**
+ * SingleProductDetail Component displays detailed information about a single product, including images,
+ * ratings, price, description, stock status, category, and seller. It also allows users to add the product to the cart.
+ * @param {Object} singleProductData - Object containing details of the single product.
+ * @returns {JSX.Element} - Rendered component with detailed product information.
+ */
+
 const SingleProductDetail = ({ singleProductData }) => {
   const { addItemToCart } = useContext(CartContext);
   // Function to handle adding the product to the cart
