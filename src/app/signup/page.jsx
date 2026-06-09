@@ -135,7 +135,8 @@ const SignUp = () => {
                       Password
                     </label>
                     <input
-                      type={showPassword ? 'password' : 'text'}
+                      data-cy="signup-password"
+                      type={showPassword ? 'text' : 'password'}
                       id="password"
                       placeholder="Password"
                       className={Styles.inputfield}
@@ -154,9 +155,10 @@ const SignUp = () => {
                       Confirm Password
                     </label>
                     <input
-                      type={showPassword ? 'password' : 'text'}
+                      data-cy="signup-confirm-password"
+                      type={showPassword ? 'text' : 'password'}
                       id="confirm_password"
-                      placeholder="Confirm Password "
+                      placeholder="Confirm Password"
                       className={Styles.inputfield}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
@@ -167,7 +169,7 @@ const SignUp = () => {
                   </div>
 
                   <div className="my-4">
-                    <button type="submit" className={Styles.signinbtn}>
+                    <button type="submit" className={Styles.signinbtn} data-cy="signup-submit">
                       Sign Up
                     </button>
                   </div>
