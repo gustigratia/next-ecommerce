@@ -171,8 +171,8 @@ const LogIn = () => {
                   <span className="text-xs text-gray-400 font-semibold">
                     Don't have an account?
                   </span>
-                  <Link href="/signup">
-                    <span className={Styles.forget}>Sign up</span>
+                  <Link href="/signup" className={Styles.forget} data-cy="signup-link">
+                    Sign up
                   </Link>
                 </div>
               </div>

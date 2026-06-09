@@ -4,13 +4,15 @@
  * This test targets the actual product card component in this repo:
  * src/app/productList/ProductItem.jsx
  */
-import { render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import CartContext from '@/app/context/CartContext';
 import ProductItem from '@/app/productList/ProductItem';
 
 const mockAddItemToCart = jest.fn();
+const mockIsInWishlist = jest.fn();
+const mockToggleWishlist = jest.fn();
 
 jest.mock('@/app/context/FirebaseContext', () => ({
   __esModule: true,
@@ -18,6 +20,18 @@ jest.mock('@/app/context/FirebaseContext', () => ({
     user: { uid: 'test-user' },
     loading: false,
   })),
+}));
+
+jest.mock('@/app/context/WishlistContext', () => ({
+  __esModule: true,
+  useWishlist: () => ({
+    wishlist: { wishlistItems: [] },
+    addToWishlist: jest.fn(),
+    removeFromWishlist: jest.fn(),
+    isInWishlist: mockIsInWishlist,
+    toggleWishlist: mockToggleWishlist,
+    clearWishlist: jest.fn(),
+  }),
 }));
 
 jest.mock('react-star-ratings', () => {
@@ -42,7 +56,10 @@ function renderProductItem(customProduct = product) {
   return render(
     <CartContext.Provider
       value={{
+        cart: { cartItems: [] },
         addItemToCart: mockAddItemToCart,
+        deleteItemFromCart: jest.fn(),
+        clearCart: jest.fn(),
       }}
     >
       <ProductItem product={customProduct} />
@@ -53,6 +70,11 @@ function renderProductItem(customProduct = product) {
 describe('ProductItem', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsInWishlist.mockReturnValue(false);
+  });
+
+  afterEach(() => {
+    cleanup();
   });
 
   it('renders product name and price', () => {
@@ -76,8 +98,8 @@ describe('ProductItem', () => {
 
     renderProductItem();
 
-    const buttons = screen.getAllByRole('button', { name: /add to cart/i });
-    await user.click(buttons[0]);
+    const button = screen.getByRole('button', { name: /add to cart/i });
+    await user.click(button);
 
     expect(mockAddItemToCart).toHaveBeenCalledTimes(1);
     expect(mockAddItemToCart).toHaveBeenCalledWith({
@@ -103,6 +125,21 @@ describe('ProductItem', () => {
     renderProductItem();
 
     expect(screen.getByTestId('product-rating')).toBeInTheDocument();
-    expect(screen.getAllByText(/4\.5/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Rating: 4\.5/)).toBeInTheDocument();
+  });
+
+  it('calls toggleWishlist when the wishlist button is clicked', async () => {
+    const user = userEvent.setup();
+
+    renderProductItem();
+
+    const wishlistButton = screen.getByRole('button', {
+      name: /add to wishlist/i,
+    });
+
+    await user.click(wishlistButton);
+
+    expect(mockToggleWishlist).toHaveBeenCalledTimes(1);
+    expect(mockToggleWishlist).toHaveBeenCalledWith(product);
   });
 });
