@@ -1,45 +1,119 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const orderItemSchema = new mongoose.Schema({
   product: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
+    type: String,
     required: true,
   },
   name: {
     type: String,
     required: true,
   },
-  quantity: {
-    type: Number,
-    required: true,
-  },
   price: {
     type: Number,
     required: true,
   },
-});
-
-const orderSchema = new mongoose.Schema({
-  userEmail: {
+  image: {
     type: String,
-    required: true,
   },
-  orderItems: [orderItemSchema],
-  totalAmount: {
+  stock: {
+    type: Number,
+  },
+  seller: {
+    type: String,
+  },
+  quantity: {
     type: Number,
     required: true,
   },
-  orderStatus: {
+});
+
+const shippingInfoSchema = new mongoose.Schema({
+  fullName: {
     type: String,
     required: true,
-    default: 'Processing',
-    enum: ['Processing', 'Shipped', 'Delivered', 'Cancelled'],
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
+  phone: {
+    type: String,
+    required: true,
+  },
+  address: {
+    type: String,
+    required: true,
+  },
+  city: {
+    type: String,
+    required: true,
+  },
+  postalCode: {
+    type: String,
+    required: true,
+  },
+  country: {
+    type: String,
+    required: true,
   },
 });
 
-export default mongoose.models.Order || mongoose.model('Order', orderSchema);
+const paymentInfoSchema = new mongoose.Schema({
+  method: {
+    type: String,
+    enum: ["COD", "Card"],
+    required: true,
+  },
+  cardLast4: {
+    type: String,
+  },
+  cardName: {
+    type: String,
+  },
+  expiryDate: {
+    type: String,
+  },
+});
+
+const orderSchema = new mongoose.Schema(
+  {
+    user: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    userEmail: {
+      type: String,
+    },
+    shippingInfo: {
+      type: shippingInfoSchema,
+      required: true,
+    },
+    orderItems: {
+      type: [orderItemSchema],
+      required: true,
+    },
+    paymentInfo: {
+      type: paymentInfoSchema,
+      required: true,
+    },
+    amountWithoutTax: {
+      type: Number,
+      required: true,
+    },
+    taxAmount: {
+      type: Number,
+      required: true,
+    },
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
+    orderStatus: {
+      type: String,
+      default: "Processing",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+export default mongoose.models.Order || mongoose.model("Order", orderSchema);
