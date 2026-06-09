@@ -160,23 +160,17 @@ export const CartProvider = ({ children }) => {
       console.error('Failed to clear cart:', error);
       toast.error('An error occurred while clearing your cart.');
     }
+  }, [getAuthToken]);
 
-    const data = await res.json();
-    setCart(data.cart);
-  };
-
-  return (
-    <CartContext.Provider
-      value={{
-        cart,
-        fetchCart,
-        addItemToCart,
-        deleteItemFromCart,
-        clearCart,
-      }}
-    >
-      {children}
-    </CartContext.Provider>
+  const value = useMemo(
+    () => ({
+      cart,
+      fetchCart,
+      addItemToCart,
+      deleteItemFromCart,
+      clearCart,
+    }),
+    [cart, fetchCart, addItemToCart, deleteItemFromCart, clearCart]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

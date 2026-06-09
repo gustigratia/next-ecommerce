@@ -6,24 +6,31 @@ on:
   pull_request:
     branches: [master]
 
-jobs:
-  lint-and-test:
-    name: Install, Lint, Test, Build, and Cypress Local
-    runs-on: ubuntu-latest
+permissions:
+  contents: read
 
-    env:
-      DB_URI: ${{ secrets.DB_URI_STAGING }}
-      FIREBASE_ADMIN_PROJECT_ID: ${{ secrets.FIREBASE_ADMIN_PROJECT_ID }}
-      FIREBASE_ADMIN_CLIENT_EMAIL: ${{ secrets.FIREBASE_ADMIN_CLIENT_EMAIL }}
-      FIREBASE_ADMIN_PRIVATE_KEY_B64: ${{ secrets.FIREBASE_ADMIN_PRIVATE_KEY_B64 }}
-      FIREBASE_ADMIN_PRIVATE_KEY: ${{ secrets.FIREBASE_ADMIN_PRIVATE_KEY }}
-      NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
-      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
-      NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
-      NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
-      NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
-      NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
-      CYPRESS_BASE_URL: http://localhost:3000
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DB_URI: ${{ secrets.DB_URI_STAGING }}
+  FIREBASE_ADMIN_PROJECT_ID: ${{ secrets.FIREBASE_ADMIN_PROJECT_ID }}
+  FIREBASE_ADMIN_CLIENT_EMAIL: ${{ secrets.FIREBASE_ADMIN_CLIENT_EMAIL }}
+  FIREBASE_ADMIN_PRIVATE_KEY_B64: ${{ secrets.FIREBASE_ADMIN_PRIVATE_KEY_B64 }}
+  NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+  NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+  CYPRESS_BASE_URL: http://127.0.0.1:3000
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
@@ -44,8 +51,76 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
+  test:
+    name: Jest Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install correct npm version
+        run: npm install -g npm@11.6.2
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Run Jest tests
         run: npm test
+
+  build:
+    name: Build Next.js App
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [lint, test]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install correct npm version
+        run: npm install -g npm@11.6.2
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js app
+        run: npm run build
+
+  e2e:
+    name: Cypress E2E Local
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install correct npm version
+        run: npm install -g npm@11.6.2
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build Next.js app
         run: npm run build
@@ -54,8 +129,7 @@ jobs:
         run: npm start &
 
       - name: Wait for local app
-        run: |
-          npx wait-on http://localhost:3000 --timeout 120000
+        run: npx wait-on http://127.0.0.1:3000 --timeout 120000
 
       - name: Run Cypress E2E locally
         run: npm run cy:run -- --browser chrome
@@ -66,6 +140,7 @@ jobs:
         with:
           name: cypress-screenshots-local
           path: cypress/screenshots
+          if-no-files-found: ignore
 
       - name: Upload Cypress videos
         if: always()
@@ -73,3 +148,4 @@ jobs:
         with:
           name: cypress-videos-local
           path: cypress/videos
+          if-no-files-found: ignore

@@ -29,24 +29,42 @@ const Profile = () => {
 
       const fetchData = async () => {
         setIsLoading(true);
+
         try {
           // Fetch user data from MongoDB
-          const userRes = await fetch(`/api/user?email=${user.email}`);
+          const userRes = await fetch(`/api/user?email=${encodeURIComponent(user.email)}`);
+
           if (userRes.ok) {
             const userData = await userRes.json();
+
             if (userData.firstName) setFirstName(userData.firstName);
             if (userData.lastName) setLastName(userData.lastName);
             if (userData.phoneNumber) setPhoneNumber(userData.phoneNumber);
           }
 
           // Fetch orders from MongoDB
-          const ordersRes = await fetch(`/api/orders?email=${user.email}`);
+          const token = await user.getIdToken();
+
+          const ordersRes = await fetch(`/api/orders?email=${encodeURIComponent(user.email)}`, {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
           if (ordersRes.ok) {
             const ordersData = await ordersRes.json();
-            setOrders(ordersData);
+
+            const fetchedOrders = Array.isArray(ordersData) ? ordersData : ordersData.orders || [];
+
+            setOrders(fetchedOrders.slice(0, 5));
+          } else {
+            console.error('Failed to fetch orders:', ordersRes.status);
+            setOrders([]);
           }
         } catch (error) {
           console.error('Error fetching data:', error);
+          setOrders([]);
         } finally {
           setIsLoading(false);
         }
@@ -105,10 +123,10 @@ const Profile = () => {
               <Link href="#" className="text-blue-600 font-medium hover:underline">
                 Dashboard
               </Link>
-              <Link href="#" className="text-gray-600 hover:text-blue-600">
+              <Link href="/orderlist" className="text-gray-600 hover:text-blue-600">
                 My Orders
               </Link>
-              <Link href="#" className="text-gray-600 hover:text-blue-600">
+              <Link href="/wishlist" className="text-gray-600 hover:text-blue-600">
                 Wishlist
               </Link>
               <Link href="#" className="text-gray-600 hover:text-blue-600">
@@ -211,7 +229,7 @@ const Profile = () => {
           <div className="bg-white shadow-md rounded-md p-6">
             <div className="flex justify-between items-center mb-4 border-b pb-2">
               <h2 className="text-lg font-semibold text-gray-800">Recent Orders</h2>
-              <Link href="#" className="text-sm text-blue-600 hover:underline">
+              <Link href="/orderlist" className="text-sm text-blue-600 hover:underline">
                 View All
               </Link>
             </div>

@@ -8,6 +8,10 @@ on:
     branches:
       - master
 
+concurrency:
+  group: cd-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
+
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: asia-southeast2
@@ -20,6 +24,7 @@ jobs:
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     environment: staging
 
     permissions:
@@ -101,6 +106,7 @@ jobs:
   e2e-staging:
     name: Run Cypress E2E on Staging
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: deploy-staging
     environment: staging
 
@@ -143,6 +149,7 @@ jobs:
         with:
           name: cypress-screenshots-staging
           path: cypress/screenshots
+          if-no-files-found: ignore
 
       - name: Upload Cypress videos
         if: always()
@@ -150,10 +157,12 @@ jobs:
         with:
           name: cypress-videos-staging
           path: cypress/videos
+          if-no-files-found: ignore
 
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     needs:
       - deploy-staging
       - e2e-staging
@@ -173,6 +182,16 @@ jobs:
 
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
+
+      - name: Capture current production revision
+        id: current-production
+        run: |
+          CURRENT_REVISION=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region ${{ env.REGION }} \
+            --format="value(status.traffic[0].revisionName)")
+
+          echo "revision=$CURRENT_REVISION" >> "$GITHUB_OUTPUT"
+          echo "Current production revision: $CURRENT_REVISION"
 
       - name: Deploy to Cloud Run Production
         uses: google-github-actions/deploy-cloudrun@v2
@@ -194,8 +213,26 @@ jobs:
             NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
             NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
 
-      - name: Show production service URL
+      - name: Smoke test production
         run: |
-          gcloud run services describe ${{ env.SERVICE_NAME }} \
+          PRODUCTION_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
             --region ${{ env.REGION }} \
-            --format="value(status.url)"
+            --format="value(status.url)")
+
+          echo "Production URL: $PRODUCTION_URL"
+
+          curl --fail \
+            --retry 6 \
+            --retry-all-errors \
+            --retry-delay 10 \
+            --max-time 30 \
+            "$PRODUCTION_URL"
+
+      - name: Rollback production on failure
+        if: failure()
+        run: |
+          echo "Rolling back to previous revision: ${{ steps.current-production.outputs.revision }}"
+
+          gcloud run services update-traffic ${{ env.SERVICE_NAME }} \
+            --region ${{ env.REGION }} \
+            --to-revisions ${{ steps.current-production.outputs.revision }}=100
