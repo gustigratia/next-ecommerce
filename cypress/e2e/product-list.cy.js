@@ -14,11 +14,17 @@ describe('Product list page', () => {
     cy.contains(/Free Shipping/i).should('be.visible');
   });
 
-  it('mengirim keyword search ke halaman productList', () => {
-    cy.get('nav form input, form input[required]').first().clear().type('laptop{enter}');
+  it('Mengirim keyword search ke halaman productList', () => {
+    cy.get('form input[placeholder="Search for products..."]').first().as('searchInput');
+
+    cy.get('@searchInput').clear().type('laptop{enter}');
 
     cy.location('pathname').should('include', '/productList');
     cy.location('search').should('include', 'keyword=laptop');
+
+    cy.get('form input[placeholder="Search for products..."]')
+      .first()
+      .should('have.value', 'laptop');
   });
 
   it('bisa berpindah halaman pagination', () => {

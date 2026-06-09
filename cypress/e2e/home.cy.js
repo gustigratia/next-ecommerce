@@ -16,7 +16,7 @@ describe('Home page', () => {
   });
 
   it('bisa membuka halaman login dari navbar', () => {
-    cy.contains(/Sign in\/Sign up/i).click();
+    cy.get('a[href="/login"]').first().click();
 
     cy.location('pathname').should('include', '/login');
     cy.contains(/Welcome To Ecommerce Site/i).should('be.visible');
