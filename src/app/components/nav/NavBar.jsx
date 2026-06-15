@@ -32,7 +32,6 @@ const NavBar = () => {
       </div>
 
       <div className="sticky top-0 w-full bg-gradient-to-r from-red-700 via-red-600 to-red-700 z-30 shadow-xl text-white">
-        <div className="h-1 bg-white/95 shimmer-animation" />
         <div className="py-3 border-b border-white/15">
           <Container>
             <div className="flex items-center justify-between gap-3 md:gap-0">

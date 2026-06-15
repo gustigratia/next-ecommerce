@@ -4,10 +4,10 @@
 
 /* Tema Kemerdekaan Indonesia */
 :root {
-  --primary-red: #DC143C;
-  --secondary-red: #EF4444;
-  --white: #FFFFFF;
-  --dark-red: #991B1B;
+  --primary-red: #dc143c;
+  --secondary-red: #ef4444;
+  --white: #ffffff;
+  --dark-red: #991b1b;
 }
 
 body::-webkit-scrollbar {
@@ -27,7 +27,8 @@ body::-webkit-scrollbar-track {
 
 /* Animasi Bendera Indonesia */
 @keyframes wave {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -36,7 +37,8 @@ body::-webkit-scrollbar-track {
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -45,11 +47,11 @@ body::-webkit-scrollbar-track {
 }
 
 @keyframes shimmer {
-  0%, 100% {
-    opacity: 1;
+  0% {
+    transform: translateX(-100%);
   }
-  50% {
-    opacity: 0.7;
+  100% {
+    transform: translateX(200%);
   }
 }
 
