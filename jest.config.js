@@ -24,13 +24,16 @@ const config = {
     '^next/image$': '<rootDir>/__mocks__/next-image.js',
     '^next/link$': '<rootDir>/__mocks__/next-link.js',
     // CSS / static assets
+    '^swiper/css$': 'identity-obj-proxy',
+    '^swiper/css/(.*)$': 'identity-obj-proxy',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '\\.(jpg|jpeg|png|gif|webp|svg)$': '<rootDir>/__mocks__/fileMock.js',
     // Path aliases (adjust if the project uses @/ or ~/src/)
     '^@/(.*)$': '<rootDir>/src/$1',
   },
 
-  // ✅ Correct key:
+  // ✅ Setup polyfills and test utilities before executing tests
+  setupFiles: ['<rootDir>/jest.setup.js'],
   setupFilesAfterEnv: ['@testing-library/jest-dom'],
 
   // Include all source files so un-tested files still count against coverage

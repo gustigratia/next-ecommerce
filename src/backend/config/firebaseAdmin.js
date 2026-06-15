@@ -8,9 +8,11 @@ const getFirebaseAdminApp = () => {
 
   const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
-  const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY_B64
-    ? Buffer.from(process.env.FIREBASE_ADMIN_PRIVATE_KEY_B64, 'base64').toString('utf8')
-    : undefined;
+  const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY
+    ? process.env.FIREBASE_ADMIN_PRIVATE_KEY.replace(/\\n/g, '\n')
+    : process.env.FIREBASE_ADMIN_PRIVATE_KEY_B64
+      ? Buffer.from(process.env.FIREBASE_ADMIN_PRIVATE_KEY_B64, 'base64').toString('utf8')
+      : undefined;
 
   if (!projectId || !clientEmail || !privateKey) {
     throw new Error('Firebase Admin environment variables are missing');
