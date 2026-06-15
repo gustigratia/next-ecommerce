@@ -1,11 +1,18 @@
-import { NextResponse } from 'next/server';
-
 import dbConnect from '@/backend/config/dbConnect';
-import { verifyIdToken } from "@/backend/config/firebaseAdmin";
+import { verifyIdToken } from '@/backend/config/firebaseAdmin';
 import { Cart } from '@/backend/models/cart';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+const jsonResponse = (body, status = 200) => {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
 
 const getUserFromRequest = async (req) => {
   const authHeader = req.headers.get('authorization');
@@ -25,19 +32,18 @@ export async function GET(req) {
     await dbConnect();
 
     const user = await getUserFromRequest(req);
-
     const cart = await Cart.findOne({ userId: user.uid });
 
-    return NextResponse.json(
+    return jsonResponse(
       {
         cart: {
           cartItems: cart?.items || [],
         },
       },
-      { status: 200 }
+      200
     );
   } catch (error) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return jsonResponse({ error: 'Unauthorized' }, 401);
   }
 }
 
@@ -56,13 +62,13 @@ export async function POST(req) {
         items: [item],
       });
 
-      return NextResponse.json(
+      return jsonResponse(
         {
           cart: {
             cartItems: cart.items,
           },
         },
-        { status: 201 }
+        201
       );
     }
 
@@ -76,16 +82,16 @@ export async function POST(req) {
 
     await cart.save();
 
-    return NextResponse.json(
+    return jsonResponse(
       {
         cart: {
           cartItems: cart.items,
         },
       },
-      { status: 200 }
+      200
     );
   } catch (error) {
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+    return jsonResponse({ error: error.message || 'Internal Server Error' }, 500);
   }
 }
 
@@ -94,20 +100,19 @@ export async function DELETE(req) {
     await dbConnect();
 
     const user = await getUserFromRequest(req);
-
     const { searchParams } = new URL(req.url);
     const productId = searchParams.get('product');
 
     const cart = await Cart.findOne({ userId: user.uid });
 
     if (!cart) {
-      return NextResponse.json(
+      return jsonResponse(
         {
           cart: {
             cartItems: [],
           },
         },
-        { status: 200 }
+        200
       );
     }
 
@@ -119,15 +124,15 @@ export async function DELETE(req) {
 
     await cart.save();
 
-    return NextResponse.json(
+    return jsonResponse(
       {
         cart: {
           cartItems: cart.items,
         },
       },
-      { status: 200 }
+      200
     );
   } catch (error) {
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+    return jsonResponse({ error: error.message || 'Internal Server Error' }, 500);
   }
 }
