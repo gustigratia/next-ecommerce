@@ -1,6 +1,8 @@
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
+import PromoModal from '../app/components/PromoModal';
+
 const HeroAnimation = dynamic(() => import('@/app/components/hero/HeroAnimation'), { ssr: false });
 
 const staticLinkData = [
@@ -63,6 +65,7 @@ const featureData = [
 export default function Home() {
   return (
     <section className="w-full text-gray-700">
+      <PromoModal />
       <div className="mx-auto w-full max-w-screen-xl px-4 py-6 md:py-10">
         <div className="relative overflow-hidden rounded-xl border border-red-100 bg-gradient-to-br from-white via-red-50 to-white shadow-sm">
           <div className="absolute left-0 top-0 h-3 w-full bg-red-600" />
@@ -130,8 +133,7 @@ export default function Home() {
               </h2>
             </div>
             <p className="max-w-lg text-sm text-gray-600">
-              Pilih kategori favorit dan temukan produk terbaik untuk melengkapi momen
-              Kemerdekaan.
+              Pilih kategori favorit dan temukan produk terbaik untuk melengkapi momen Kemerdekaan.
             </p>
           </div>
 
