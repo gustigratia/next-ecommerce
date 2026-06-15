@@ -26,9 +26,9 @@ const ProductItem = ({ product }) => {
   };
 
   return (
-    <article className="border border-gray-200 overflow-hidden bg-white shadow-sm rounded-xl mb-5 hover:shadow-lg transition-shadow duration-300 group">
+    <article className="border-2 border-red-300 overflow-hidden bg-white shadow-lg rounded-xl mb-5 hover:shadow-2xl transition-shadow duration-300 group">
       <div className="flex flex-col md:flex-row">
-        <div className="md:w-1/4 flex p-3 relative overflow-hidden">
+        <div className="md:w-1/4 flex p-3 relative overflow-hidden bg-red-50">
           <img
             src={productImage}
             alt={product.name}
@@ -38,13 +38,13 @@ const ProductItem = ({ product }) => {
           <button
             type="button"
             onClick={() => toggleWishlist(product)}
-            className="absolute top-4 right-4 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200"
-            aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+            className="absolute top-4 right-4 w-10 h-10 bg-red-600 rounded-full shadow-lg flex items-center justify-center hover:bg-red-700 hover:scale-110 active:scale-95 transition-all duration-200"
+            aria-label={inWishlist ? 'Hapus dari wishlist' : 'Tambah ke wishlist'}
           >
             <i
               className={`${
-                inWishlist ? 'fas text-red-500' : 'far text-gray-400'
-              } fa-heart text-sm`}
+                inWishlist ? 'fas text-white' : 'far text-white'
+              } fa-heart text-lg`}
             />
           </button>
         </div>
@@ -52,7 +52,7 @@ const ProductItem = ({ product }) => {
         <div className="md:w-2/4">
           <div className="p-4">
             <Link href={`/productList/${product._id}`} className="hover:underline">
-              <h2 className="text-xl font-semibold text-gray-900 hover:text-red-900 transition-colors line-clamp-2">
+              <h2 className="text-xl font-bold text-red-700 hover:text-red-600 transition-colors line-clamp-2">
                 {product.name}
               </h2>
             </Link>
@@ -60,62 +60,62 @@ const ProductItem = ({ product }) => {
             <div className="flex flex-wrap items-center gap-2 my-2">
               <StarRatings
                 rating={product?.ratings || 0}
-                starRatedColor="#FFD700"
+                starRatedColor="#DC143C"
                 numberOfStars={5}
                 starDimension="18px"
                 starSpacing="1px"
                 name={`rating-${product._id}`}
               />
 
-              <span className="text-gray-500 text-sm">({product?.ratings || 0})</span>
+              <span className="text-gray-600 text-sm font-semibold">({product?.ratings || 0})</span>
             </div>
 
-            <p className="text-gray-600 mb-2 line-clamp-3 text-sm leading-relaxed">
+            <p className="text-gray-700 mb-2 line-clamp-3 text-sm leading-relaxed">
               {product?.description}
             </p>
 
             {product?.seller && (
-              <p className="text-xs text-gray-400">
-                <i className="fas fa-store mr-1" />
+              <p className="text-xs text-gray-600 font-semibold">
+                <i className="fas fa-store mr-1 text-red-600" />
                 {product.seller}
               </p>
             )}
           </div>
         </div>
 
-        <div className="md:w-1/4 border-t lg:border-t-0 lg:border-l-2 border-gray-100 flex flex-col justify-center items-center">
+        <div className="md:w-1/4 border-t lg:border-t-0 lg:border-l-2 border-red-300 flex flex-col justify-center items-center">
           <div className="p-5 text-center w-full">
-            <span className="text-2xl font-bold text-gray-900">
-              ₹
-              {Number(product?.price).toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
+            <span className="text-3xl font-bold text-red-600">
+              Rp
+              {Number(product?.price).toLocaleString('id-ID', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
               })}
             </span>
 
-            <p className="text-green-600 text-sm mt-1">
+            <p className="text-red-600 text-sm mt-1 font-bold">
               <i className="fas fa-truck mr-1" />
-              Free Shipping
+              Pengiriman Gratis
             </p>
 
             {product?.stock > 0 ? (
-              <span className="inline-block mt-2 text-xs text-green-700 bg-green-100 px-3 py-0.5 rounded-full font-medium">
-                In Stock ({product.stock})
+              <span className="inline-block mt-2 text-xs text-white bg-red-600 px-3 py-0.5 rounded-full font-bold">
+                Tersedia ({product.stock})
               </span>
             ) : (
-              <span className="inline-block mt-2 text-xs text-red-700 bg-red-100 px-3 py-0.5 rounded-full font-medium">
-                Out of Stock
+              <span className="inline-block mt-2 text-xs text-white bg-gray-400 px-3 py-0.5 rounded-full font-bold">
+                Habis Terjual
               </span>
             )}
 
             <button
               type="button"
-              className="mt-4 w-full text-white bg-yellow-600 border border-transparent rounded-lg hover:bg-yellow-700 active:scale-95 transition-all duration-200 cursor-pointer px-4 py-2.5 flex items-center justify-center gap-2 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="mt-4 w-full text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 active:scale-95 transition-all duration-200 cursor-pointer px-4 py-2.5 flex items-center justify-center gap-2 font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
               onClick={addToCartHandler}
               disabled={!product?.stock || product.stock === 0}
             >
               <i className="fa-solid fa-cart-shopping" />
-              Add to Cart
+              Tambah ke Keranjang
             </button>
           </div>
         </div>

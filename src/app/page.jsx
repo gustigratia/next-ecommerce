@@ -1,10 +1,7 @@
-import Image from 'next/image';
-import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 
-import HeroAnimation from '../app/components/hero/HeroAnimation';
-
-dynamic(() => import('@/app/components/hero/HeroAnimation'), { ssr: false });
+const HeroAnimation = dynamic(() => import('@/app/components/hero/HeroAnimation'), { ssr: false });
 
 const staticLinkData = [
   {
@@ -45,81 +42,119 @@ const staticLinkData = [
   },
 ];
 
+const featureData = [
+  {
+    icon: 'fas fa-truck',
+    title: 'Pengiriman Gratis',
+    description: 'Untuk pembelian di atas Rp 200.000',
+  },
+  {
+    icon: 'fas fa-money-check-dollar',
+    title: 'Garansi Uang Kembali',
+    description: 'Kembalikan dalam 30 hari tanpa pertanyaan',
+  },
+  {
+    icon: 'fas fa-headset',
+    title: 'Dukungan 24/7',
+    description: 'Tim pelanggan siap membantu setiap saat',
+  },
+];
+
 export default function Home() {
   return (
-    <section className="text-gray-600 w-full md:w-11/12 px-4 mx-auto">
-      <div className="mx-auto flex py-4 md:flex-row flex-col items-center">
-        <div className="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center text-center relative py-10">
-          <span className="block font-bold text-xl md:text-2xl px-4 rounded-xl running-text">
-            Ecommerce website for ShowCase
-          </span>
-          <h1 className="title-font text-3xl md:text-4xl mb-4 font-medium text-gray-900">
-            I Work. You will Grow.
-          </h1>
-          <p className="mb-8 leading-relaxed text-justify font-sans font-semibold text-slate-400">
-            I am dedicated for professionals works, including skilled developers, creative
-            designers, customer-focused experts, technology enthusiasts, and operations specialists.
-            Our unwavering mission is to collaboratively assist our clients and partners in bringing
-            their innovative ideas to life.
-            <br />
-            From web and mobile application development to cutting-edge design, we cater to your
-            diverse needs. As technology enthusiasts and problem-solvers, we handle every aspect of
-            your project, from conception to execution.
-          </p>
-          <div className="flex justify-center">
-            <Link
-              href="/productList"
-              className="inline-flex text-white bg-red-800 border-0 py-2 px-8 focus:outline-none hover:bg-red-600 rounded text-lg"
+    <section className="w-full text-gray-700">
+      <div className="mx-auto w-full max-w-screen-xl px-4 py-6 md:py-10">
+        <div className="relative overflow-hidden rounded-xl border border-red-100 bg-gradient-to-br from-white via-red-50 to-white shadow-sm">
+          <div className="absolute left-0 top-0 h-3 w-full bg-red-600" />
+          <div className="grid items-center gap-8 px-5 py-10 md:grid-cols-2 md:px-10 lg:px-14">
+            <div>
+              <span className="inline-flex items-center gap-2 rounded-full bg-red-100 px-4 py-2 text-sm font-bold uppercase tracking-wide text-red-700">
+                <i className="fas fa-flag" />
+                Promo Kemerdekaan
+              </span>
+              <h1 className="mt-5 text-4xl font-extrabold leading-tight text-gray-950 md:text-5xl">
+                Merdeka Berbelanja, Merdeka Hemat
+              </h1>
+              <p className="mt-4 max-w-xl text-base leading-relaxed text-gray-600 md:text-lg">
+                Temukan produk elektronik, kamera, laptop, aksesori, dan kebutuhan harian dengan
+                suasana merah putih yang rapi, cepat, dan mudah dipakai.
+              </p>
+
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href="/productList"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-6 py-3 font-bold text-white shadow-md transition hover:bg-red-700 active:scale-95"
+                >
+                  <i className="fas fa-shopping-bag" />
+                  Mulai Berbelanja
+                </Link>
+                <Link
+                  href="/wishlist"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-white px-6 py-3 font-bold text-red-700 shadow-sm transition hover:bg-red-50 active:scale-95"
+                >
+                  <i className="fas fa-heart" />
+                  Lihat Wishlist
+                </Link>
+              </div>
+            </div>
+
+            <div className="relative mx-auto w-full max-w-lg">
+              <HeroAnimation />
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+          {featureData.map((item) => (
+            <div
+              key={item.title}
+              className="rounded-xl border border-red-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
             >
-              Let's Go To Ecommerce
-            </Link>
-          </div>
-        </div>
-        <div className="lg:max-w-xl lg:w-full md:w-1/2 w-5/6">
-          <HeroAnimation />
-        </div>
-      </div>
-
-      <div className="container py-9">
-        <div className="w-10/12 grid grid-cols-1 md:grid-cols-3 gap-6 mx-auto justify-center">
-          <div className="border border-gray-300 rounded-sm p-6 flex justify-center items-center flex-col">
-            <i className="fas fa-truck text-3xl text-primary mb-4"></i>
-            <div>
-              <h4 className="font-medium capitalize text-lg">Free Shipping</h4>
-              <p className="text-gray-500 text-sm">On Orders Over ₹2000</p>
-            </div>
-          </div>
-          <div className="border border-gray-300 rounded-sm p-6 flex justify-center items-center flex-col">
-            <i className="fas fa-money-check-dollar text-3xl text-primary mb-4"></i>
-            <div>
-              <h4 className="font-medium capitalize text-lg">Money Returns</h4>
-              <p className="text-gray-500 text-sm">30 Days Money Returns</p>
-            </div>
-          </div>
-          <div className="border border-gray-300 rounded-sm p-6 flex justify-center items-center flex-col">
-            <i className="fas fa-phone text-3xl text-primary mb-4"></i>
-            <div>
-              <h4 className="font-medium capitalize text-lg">24/7 Support</h4>
-              <p className="text-gray-500 text-sm">Dedicated Customer Support</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="container py-16">
-        <h2 className="text-2xl font-medium text-gray-800 uppercase mb-6">shop by category</h2>
-        <div className="grid grid-cols-3 gap-3">
-          {staticLinkData.map((item) => (
-            <div key={item.id} className="relative rounded-sm overflow-hidden group">
-              <img src={item.imgUrl} alt="category 1" className="w-full h-full" />
-              <Link
-                href={`/productList?category=${encodeURIComponent(item.nameLink)}`}
-                className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center text-2xl text-white font-roboto font-extrabold group-hover:bg-opacity-60 transition"
-              >
-                {item.nameLink}
-              </Link>
+              <span className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-red-100 text-xl text-red-600">
+                <i className={item.icon}></i>
+              </span>
+              <h4 className="text-lg font-bold text-gray-900">{item.title}</h4>
+              <p className="mt-1 text-sm text-gray-600">{item.description}</p>
             </div>
           ))}
+        </div>
+
+        <div className="mt-12">
+          <div className="mb-6 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-wide text-red-600">
+                Kategori Pilihan
+              </p>
+              <h2 className="text-3xl font-extrabold text-gray-950">
+                Belanja berdasarkan kebutuhan
+              </h2>
+            </div>
+            <p className="max-w-lg text-sm text-gray-600">
+              Pilih kategori favorit dan temukan produk terbaik untuk melengkapi momen
+              Kemerdekaan.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {staticLinkData.map((item) => (
+              <div
+                key={item.id}
+                className="group relative aspect-[4/3] overflow-hidden rounded-xl bg-red-50 shadow-sm"
+              >
+                <img
+                  src={item.imgUrl}
+                  alt={item.nameLink}
+                  className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                />
+                <Link
+                  href={`/productList?category=${encodeURIComponent(item.nameLink)}`}
+                  className="absolute inset-0 flex items-end bg-gradient-to-t from-red-950/75 via-red-700/20 to-transparent p-5 text-2xl font-extrabold text-white transition group-hover:from-red-950/85"
+                >
+                  {item.nameLink}
+                </Link>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

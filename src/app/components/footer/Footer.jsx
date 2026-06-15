@@ -31,17 +31,16 @@ const SUPPORT_LINKS = [
 
 const Footer = () => {
   return (
-    <footer className="bg-red-950 text-white pt-10 pb-4">
+    <footer className="bg-gradient-to-r from-red-600 to-red-700 text-white pt-10 pb-4">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 pb-8 border-b border-red-800">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 pb-8 border-b border-white/20">
           <div>
             <div className="max-h-[55px] overflow-hidden flex items-center mb-4">
               <Image src={Logo} alt="Ecom-Web logo" width={180} height={50} />
             </div>
 
-            <p className="text-red-200 text-sm leading-relaxed mb-5">
-              Ecom-Web provides a reliable online shopping experience for electronics, laptops,
-              cameras, accessories, and other quality products.
+            <p className="text-white/90 text-sm leading-relaxed mb-5">
+              Ecom-Web menyediakan pengalaman berbelanja online yang terpercaya untuk elektronik, laptop, kamera, aksesori, dan produk berkualitas lainnya. Rayakan Kemerdekaan Bersama Kami! 🇮🇩
             </p>
 
             <div className="flex gap-3">
@@ -50,7 +49,7 @@ const Footer = () => {
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/25 transition-colors"
+                  className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/40 transition-colors"
                 >
                   <i className={`fab ${icon} text-sm`} />
                 </a>
@@ -63,7 +62,7 @@ const Footer = () => {
               Quick Links
             </h4>
 
-            <ul className="space-y-2.5 text-red-200 text-sm">
+            <ul className="space-y-2.5 text-white/90 text-sm">
               {QUICK_LINKS.map(({ label, href }) => (
                 <li key={label}>
                   <Link
@@ -82,7 +81,7 @@ const Footer = () => {
               Categories
             </h4>
 
-            <ul className="space-y-2.5 text-red-200 text-sm">
+            <ul className="space-y-2.5 text-white/90 text-sm">
               {CATEGORIES.map((category) => (
                 <li key={category}>
                   <Link
@@ -101,7 +100,7 @@ const Footer = () => {
               Customer Support
             </h4>
 
-            <ul className="space-y-2.5 text-red-200 text-sm mb-6">
+            <ul className="space-y-2.5 text-white/90 text-sm mb-6">
               {SUPPORT_LINKS.map(({ label, href }) => (
                 <li key={label}>
                   <Link href={href} className="hover:text-white transition-colors">
@@ -111,23 +110,23 @@ const Footer = () => {
               ))}
             </ul>
 
-            <div className="text-red-200 text-sm space-y-1.5">
+            <div className="text-white/90 text-sm space-y-1.5">
               <p>
-                <i className="fas fa-envelope mr-2 text-red-400" />
+                <i className="fas fa-envelope mr-2 text-yellow-300" />
                 support@ecom-web.com
               </p>
               <p>
-                <i className="fas fa-phone mr-2 text-red-400" />
+                <i className="fas fa-phone mr-2 text-yellow-300" />
                 +62 851 0171 7668
               </p>
             </div>
           </div>
         </div>
 
-        <div className="pt-5 flex flex-col sm:flex-row justify-between items-center gap-2 text-red-300 text-sm">
-          <p>&copy; {new Date().getFullYear()} Ecom-Web. All rights reserved.</p>
+        <div className="pt-5 flex flex-col sm:flex-row justify-between items-center gap-2 text-white/80 text-sm">
+          <p>&copy; {new Date().getFullYear()} Ecom-Web. Merdeka! 🇮🇩</p>
 
-          <p className="text-xs">Developed with Next.js and countless cups of coffee</p>
+          <p className="text-xs">Dibangun dengan Next.js dan Semangat Kemerdekaan Indonesia</p>
         </div>
       </div>
     </footer>
