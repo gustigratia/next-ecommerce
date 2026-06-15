@@ -204,6 +204,13 @@ const OrderDetails = ({ orderId }) => {
                     <span>₹{order.taxAmount}</span>
                   </li>
 
+                  {order.voucherInfo && (
+                    <li className="flex justify-between text-red-600 font-medium mb-1">
+                      <span>Discount ({order.voucherInfo.code}):</span>
+                      <span>-₹{order.discountAmount}</span>
+                    </li>
+                  )}
+
                   <li className="text-lg font-bold border-t flex justify-between mt-3 pt-3">
                     <span>Total price:</span>
                     <span>₹{order.totalAmount}</span>

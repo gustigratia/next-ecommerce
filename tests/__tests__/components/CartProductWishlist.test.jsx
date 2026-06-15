@@ -39,7 +39,7 @@ function ProductItem({ product }) {
     <div data-testid="product-item">
       <img src={imageUrl} alt={product.name} data-testid="product-image" />
       <h3 data-testid="product-name">{product.name}</h3>
-      <p data-testid="product-price">Rp {product.price.toLocaleString()}</p>
+      <p data-testid="product-price">£ {product.price.toLocaleString()}</p>
       {hasDiscount && <span data-testid="discount-badge">{discount}% OFF</span>}
       {outOfStock && <span data-testid="out-of-stock">Out of Stock</span>}
       {hasRatings && <span data-testid="ratings">⭐ {product.ratings}</span>}
@@ -153,7 +153,7 @@ function CartComponent({ items = [], onRemove, onUpdateQuantity, onCheckout }) {
               </button>
             </div>
           ))}
-          <div data-testid="cart-total">Total: Rp {total.toLocaleString()}</div>
+          <div data-testid="cart-total">Total: £ {total.toLocaleString()}</div>
           <button onClick={onCheckout} data-testid="checkout-btn">
             Checkout
           </button>
@@ -315,7 +315,7 @@ function WishlistPage({ wishlistItems = [], onRemove, isAuthenticated = true }) 
         wishlistItems.map((item) => (
           <div key={item._id} data-testid="wishlist-item">
             <span data-testid={`wish-name-${item._id}`}>{item.name}</span>
-            <span data-testid={`wish-price-${item._id}`}>Rp {item.price.toLocaleString()}</span>
+            <span data-testid={`wish-price-${item._id}`}>£ {item.price.toLocaleString()}</span>
             <button onClick={() => onRemove(item._id)} data-testid={`wish-remove-${item._id}`}>
               Remove
             </button>

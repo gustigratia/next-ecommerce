@@ -86,7 +86,7 @@ const ProductItem = ({ product }) => {
         <div className="md:w-1/4 border-t lg:border-t-0 lg:border-l-2 border-red-300 flex flex-col justify-center items-center">
           <div className="p-5 text-center w-full">
             <span className="text-3xl font-bold text-red-600">
-              Rp
+              £
               {Number(product?.price).toLocaleString('id-ID', {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0,

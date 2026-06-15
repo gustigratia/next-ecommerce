@@ -48,7 +48,7 @@ const featureData = [
   {
     icon: 'fas fa-truck',
     title: 'Pengiriman Gratis',
-    description: 'Untuk pembelian di atas Rp 200.000',
+    description: 'Untuk pembelian di atas £200',
   },
   {
     icon: 'fas fa-money-check-dollar',

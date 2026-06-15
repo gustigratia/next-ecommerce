@@ -129,7 +129,7 @@ export default function WishlistPage() {
               </div>
 
               <p className="text-2xl font-bold text-red-600 mb-3">
-                Rp
+                £
                 {Number(product?.price).toLocaleString('id-ID', {
                   minimumFractionDigits: 0,
                 })}

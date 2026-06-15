@@ -36,7 +36,7 @@ function OrderList({ orders = [], loading = false, error = null }) {
           <span data-testid={`order-id-${order._id}`}>{order._id}</span>
           <span data-testid={`order-status-${order._id}`}>{order.orderStatus}</span>
           <span data-testid={`order-total-${order._id}`}>
-            Rp {order.totalPrice.toLocaleString()}
+            £ {order.totalPrice.toLocaleString()}
           </span>
           <a href={`/orders/${order._id}`} data-testid={`order-link-${order._id}`}>
             View Details
@@ -125,11 +125,11 @@ function OrderDetails({ order = null, loading = false, error = null }) {
           <div key={i} data-testid="order-item">
             <span>{item.name}</span>
             <span>x{item.quantity}</span>
-            <span>Rp {item.price.toLocaleString()}</span>
+            <span>£ {item.price.toLocaleString()}</span>
           </div>
         ))}
       </div>
-      <p data-testid="order-total">Total: Rp {order.totalPrice.toLocaleString()}</p>
+      <p data-testid="order-total">Total: £ {order.totalPrice.toLocaleString()}</p>
     </div>
   );
 }

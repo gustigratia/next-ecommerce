@@ -123,12 +123,12 @@ const Cart = () => {
                         <div>
                           <div className="leading-5">
                             <p className="font-bold text-red-600">
-                              Rp
+                              £
                               {(
                                 Number(cartItem.price || 0) * Number(cartItem.quantity || 0)
                               ).toFixed(2)}
                             </p>
-                            <small className="text-gray-500">Rp{cartItem.price} / per item</small>
+                            <small className="text-gray-500">£{cartItem.price} / per item</small>
                           </div>
                         </div>
 
@@ -156,7 +156,7 @@ const Cart = () => {
                   <ul className="mb-5 space-y-2">
                     <li className="flex justify-between text-gray-700 font-semibold">
                       <span>Subtotal:</span>
-                      <span className="text-red-600">Rp{amountWithoutTax.toFixed(2)}</span>
+                      <span className="text-red-600">£{amountWithoutTax.toFixed(2)}</span>
                     </li>
 
                     <li className="flex justify-between text-gray-700 font-semibold">
@@ -169,12 +169,12 @@ const Cart = () => {
 
                     <li className="flex justify-between text-gray-700 font-semibold">
                       <span>Pajak (15%):</span>
-                      <span className="text-red-600">Rp{taxAmount.toFixed(2)}</span>
+                      <span className="text-red-600">£{taxAmount.toFixed(2)}</span>
                     </li>
 
                     <li className="text-lg font-bold border-t-2 border-red-300 flex justify-between mt-4 pt-3 text-red-700">
                       <span>Total Harga:</span>
-                      <span>Rp{totalAmount.toFixed(2)}</span>
+                      <span>£{totalAmount.toFixed(2)}</span>
                     </li>
                   </ul>
                   {/* Continue button */}
