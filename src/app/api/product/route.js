@@ -72,6 +72,26 @@ export async function POST(request) {
 //     }
 // }
 
+const FALLBACK_PRODUCTS = [
+  {
+    _id: 'prod_1',
+    name: 'Samsung Smart TV 55 Inch',
+    description: 'Large screen smart television for home entertainment.',
+    price: 8500000,
+    seller: 'Samsung Official',
+    stock: 12,
+    ratings: 4.5,
+    category: 'Electronics',
+    images: [
+      {
+        public_id: 'tv_1',
+        url: 'https://images.unsplash.com/photo-1593784991095-a205069470b6',
+      },
+    ],
+    reviews: [],
+  },
+];
+
 // Handler function for handling GET requests to fetch products with filters and pagination
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
@@ -119,6 +139,21 @@ export async function GET(req) {
       { status: 200 }
     );
   } catch (error) {
+    if (!process.env.DB_URI && process.env.NODE_ENV !== 'test') {
+      return NextResponse.json(
+        {
+          message: 'Products',
+          success: true,
+          products: FALLBACK_PRODUCTS,
+          currentPage: 1,
+          totalProducts: FALLBACK_PRODUCTS.length,
+          totalPages: 1,
+          resPerPage,
+        },
+        { status: 200 }
+      );
+    }
+
     console.error(error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }

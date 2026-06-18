@@ -11,12 +11,19 @@ describe('Cart Page', () => {
   });
 
   it('menampilkan cart kosong untuk guest user', () => {
-    cy.contains('0 Item(s) in Cart').should('be.visible');
-    cy.contains('Your cart is empty').should('be.visible');
-    cy.contains('Looks like you have not added any product to your cart yet.').should('be.visible');
-    cy.contains('Back to shop').should('be.visible');
+    cy.contains('Keranjang Belanja Kosong').should('be.visible');
+    cy.contains('Sepertinya Anda belum menambahkan produk ke keranjang').should('be.visible');
+    cy.contains('🛍️ Kembali Berbelanja 🛍️').should('be.visible');
 
-    cy.contains('Continue').should('not.exist');
-    cy.contains('Total price').should('not.exist');
+    cy.contains('✅ Lanjutkan ke Checkout').should('not.exist');
+    cy.contains('Total Harga').should('not.exist');
+  });
+
+  it('bisa kembali ke homepage dari halaman cart kosong', () => {
+    cy.contains('🛍️ Kembali Berbelanja 🛍️').click();
+
+    cy.location('pathname').should('eq', '/');
+    cy.contains(/Promo Kemerdekaan/i).should('be.visible');
+    cy.contains(/Mulai Berbelanja/i).should('be.visible');
   });
 });

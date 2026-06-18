@@ -11,7 +11,7 @@ describe('Product list page', () => {
     cy.contains('MacBook Air M2').should('be.visible');
     cy.contains('Sony Wireless Headphones').should('be.visible');
     cy.contains('Canon Mirrorless Camera').should('be.visible');
-    cy.contains(/Free Shipping/i).should('be.visible');
+    cy.contains('Pengiriman Gratis').should('be.visible');
   });
 
   it('Mengirim keyword search ke halaman productList', () => {
@@ -50,14 +50,15 @@ describe('Product list page', () => {
     cy.get('[data-cy="pagination-page-2"]').should('have.class', 'font-bold');
   });
 
-  it('menampilkan alert login ketika guest menekan Add to Cart', () => {
-    cy.on('window:alert', (message) => {
-      expect(message).to.equal('Please login first');
-    });
-
+  it('menampilkan toast login ketika guest menekan Tambah ke Keranjang', () => {
     cy.contains('Samsung Smart TV 55 Inch')
       .parents('div')
-      .contains(/Add to Cart/i)
+      .contains(/Tambah ke Keranjang/i)
       .click();
+
+    cy.get('.Toastify__toast-body', { timeout: 5000 }).should(
+      'contain.text',
+      'Please sign in to add items to your cart.'
+    );
   });
 });

@@ -4,9 +4,9 @@ describe('Home page', () => {
   });
 
   it('menampilkan landing page dan kategori toko', () => {
-    cy.contains(/Ecommerce website for ShowCase/i).should('be.visible');
-    cy.contains(/I Work\. You will Grow\./i).should('be.visible');
-    cy.contains(/shop by category/i).should('be.visible');
+    cy.contains(/Promo Kemerdekaan/i).should('be.visible');
+    cy.contains(/Merdeka Berbelanja, Merdeka Hemat/i).should('be.visible');
+    cy.contains(/Kategori Pilihan/i).should('be.visible');
 
     ['Electronics', 'Laptops', 'Cameras', 'Accessories', 'Headphones', 'Sports'].forEach(
       (category) => {
@@ -19,7 +19,7 @@ describe('Home page', () => {
     cy.get('a[href="/login"]').first().click();
 
     cy.location('pathname').should('include', '/login');
-    cy.contains(/Welcome To Ecommerce Site/i).should('be.visible');
-    cy.contains(/Sign in/i).should('be.visible');
+    cy.contains(/Selamat Datang di Ecom-Web/i).should('be.visible');
+    cy.contains(/Masuk Sekarang/i).should('be.visible');
   });
 });

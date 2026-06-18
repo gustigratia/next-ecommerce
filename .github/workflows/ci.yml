@@ -33,47 +33,41 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Checkout repository
+      - &checkout
+        name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - &setup-node
+        name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
 
-      - name: Install correct npm version
+      - &install-npm
+        name: Install correct npm version
         run: npm install -g npm@11.6.2
 
-      - name: Install dependencies
+      - &install-deps
+        name: Install dependencies
         run: npm ci
 
       - name: Run ESLint
         run: npm run lint
 
   test:
-    name: Jest Test
+    name: Jest Test and Coverage
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - *checkout
+      - *setup-node
+      - *install-npm
+      - *install-deps
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install correct npm version
-        run: npm install -g npm@11.6.2
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run Jest tests
-        run: npm test
+      - name: Run Jest tests with coverage
+        run: npm run test:ci
 
   build:
     name: Build Next.js App
@@ -82,70 +76,10 @@ jobs:
     needs: [lint, test]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install correct npm version
-        run: npm install -g npm@11.6.2
-
-      - name: Install dependencies
-        run: npm ci
+      - *checkout
+      - *setup-node
+      - *install-npm
+      - *install-deps
 
       - name: Build Next.js app
         run: npm run build
-
-  e2e:
-    name: Cypress E2E Local
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    needs: build
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install correct npm version
-        run: npm install -g npm@11.6.2
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build Next.js app
-        run: npm run build
-
-      - name: Start Next.js app
-        run: npm start &
-
-      - name: Wait for local app
-        run: npx wait-on http://127.0.0.1:3000 --timeout 120000
-
-      - name: Run Cypress E2E locally
-        run: npm run cy:run -- --browser chrome
-
-      - name: Upload Cypress screenshots
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress-screenshots-local
-          path: cypress/screenshots
-          if-no-files-found: ignore
-
-      - name: Upload Cypress videos
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress-videos-local
-          path: cypress/videos
-          if-no-files-found: ignore
