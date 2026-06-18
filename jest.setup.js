@@ -1,5 +1,3 @@
-require('@testing-library/jest-dom');
-
 const { TextEncoder, TextDecoder } = require('util');
 const { ReadableStream, TransformStream } = require('stream/web');
 const { Blob, File } = require('buffer');
