@@ -77,20 +77,20 @@ describe('Cart component', () => {
   it('shows the correct cart summary', () => {
     renderCart();
 
-    expect(screen.getByText(/2 Item\(s\) in Cart/i)).toBeInTheDocument();
-    expect(screen.getByText(/Amount before Tax:/i)).toBeInTheDocument();
+    expect(screen.getByText(/2 Item\(s\) dalam Keranjang/i)).toBeInTheDocument();
+    expect(screen.getByText(/Subtotal:/i)).toBeInTheDocument();
     expect(screen.getByText(/329\.97/)).toBeInTheDocument();
-    expect(screen.getByText(/Total Units:/i)).toBeInTheDocument();
-    expect(screen.getByText(/3 \(Units\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/Total price:/i)).toBeInTheDocument();
+    expect(screen.getByText(/Total Item:/i)).toBeInTheDocument();
+    expect(screen.getByText(/3\s*\(Produk\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Total Harga:/i)).toBeInTheDocument();
   });
 
-  it('calls deleteItemFromCart when Remove is clicked', async () => {
+  it('calls deleteItemFromCart when Hapus is clicked', async () => {
     const user = userEvent.setup();
 
     renderCart();
 
-    const removeButtons = screen.getAllByText(/remove/i);
+    const removeButtons = screen.getAllByText(/hapus/i);
     await user.click(removeButtons[0]);
 
     expect(mockDeleteItemFromCart).toHaveBeenCalledWith('prod_1');
@@ -133,8 +133,8 @@ describe('Cart component', () => {
   it('shows empty cart count when cart has no items', () => {
     renderCart([]);
 
-    expect(screen.getByText(/0 Item\(s\) in Cart/i)).toBeInTheDocument();
+    expect(screen.getByText(/0 Item\(s\) dalam Keranjang/i)).toBeInTheDocument();
     expect(screen.queryByText('Classic Sneakers')).not.toBeInTheDocument();
-    expect(screen.queryByText(/Amount before Tax:/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Subtotal:/i)).not.toBeInTheDocument();
   });
 });

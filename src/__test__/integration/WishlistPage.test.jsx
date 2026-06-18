@@ -85,11 +85,13 @@ describe('WishlistPage', () => {
   it('renders the empty wishlist state', () => {
     renderWishlistPage([]);
 
-    expect(screen.getByText(/your wishlist is empty/i)).toBeInTheDocument();
-    expect(screen.getByText(/save your favorite products/i)).toBeInTheDocument();
+    expect(screen.getByText(/wishlist masih kosong/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/simpan produk favorit Anda untuk dibeli saat promo Kemerdekaan/i)
+    ).toBeInTheDocument();
 
     const browseLink = screen.getByRole('link', {
-      name: /browse products/i,
+      name: /jelajahi produk/i,
     });
 
     expect(browseLink).toBeInTheDocument();
@@ -101,7 +103,7 @@ describe('WishlistPage', () => {
 
     expect(screen.getByText('Classic Sneakers')).toBeInTheDocument();
     expect(screen.getByText(/99[,.]99/)).toBeInTheDocument();
-    expect(screen.getByText(/\(1 item\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/1\s*item/i)).toBeInTheDocument();
   });
 
   it('renders the product image', () => {
@@ -132,13 +134,13 @@ describe('WishlistPage', () => {
     expect(screen.getByText(/Rating: 4\.5/)).toBeInTheDocument();
   });
 
-  it('calls addItemToCart when Add to Cart is clicked', async () => {
+  it('calls addItemToCart when Tambah ke Keranjang is clicked', async () => {
     const user = userEvent.setup();
 
     renderWishlistPage();
 
     const addToCartButton = screen.getByRole('button', {
-      name: /add to cart/i,
+      name: /tambah ke keranjang/i,
     });
 
     await user.click(addToCartButton);
@@ -154,13 +156,13 @@ describe('WishlistPage', () => {
     });
   });
 
-  it('calls removeFromWishlist when remove button is clicked', async () => {
+  it('calls removeFromWishlist when Hapus dari wishlist is clicked', async () => {
     const user = userEvent.setup();
 
     renderWishlistPage();
 
     const removeButton = screen.getByRole('button', {
-      name: /remove from wishlist/i,
+      name: /hapus dari wishlist/i,
     });
 
     await user.click(removeButton);
@@ -175,7 +177,7 @@ describe('WishlistPage', () => {
     renderWishlistPage();
 
     const clearButton = screen.getByRole('button', {
-      name: /clear wishlist/i,
+      name: /hapus wishlist/i,
     });
 
     await user.click(clearButton);
@@ -192,7 +194,7 @@ describe('WishlistPage', () => {
     renderWishlistPage();
 
     const clearButton = screen.getByRole('button', {
-      name: /clear wishlist/i,
+      name: /hapus wishlist/i,
     });
 
     await user.click(clearButton);

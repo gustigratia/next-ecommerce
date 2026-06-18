@@ -216,7 +216,7 @@ describe('small presentational components', () => {
 
     expect(screen.getByRole('link', { name: /About Us/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /^Products$/i })).toBeInTheDocument();
-    expect(screen.getByText(/All rights reserved/i)).toBeInTheDocument();
+    expect(screen.getByText(/©\s*2026\s*Ecom-Web/i)).toBeInTheDocument();
   });
 
   it('renders Hero carousel and HeroAnimation', () => {

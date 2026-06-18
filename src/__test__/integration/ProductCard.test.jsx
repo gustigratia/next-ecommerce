@@ -81,7 +81,7 @@ describe('ProductItem', () => {
     renderProductItem();
 
     expect(screen.getByText('Classic Sneakers')).toBeInTheDocument();
-    expect(screen.getByText(/99[,.]99/)).toBeInTheDocument();
+    expect(screen.getByText(/100/)).toBeInTheDocument();
   });
 
   it('renders the product image', () => {
@@ -98,7 +98,7 @@ describe('ProductItem', () => {
 
     renderProductItem();
 
-    const button = screen.getByRole('button', { name: /add to cart/i });
+    const button = screen.getByRole('button', { name: /tambah ke keranjang/i });
     await user.click(button);
 
     expect(mockAddItemToCart).toHaveBeenCalledTimes(1);
@@ -134,7 +134,7 @@ describe('ProductItem', () => {
     renderProductItem();
 
     const wishlistButton = screen.getByRole('button', {
-      name: /add to wishlist/i,
+      name: /tambah ke wishlist/i,
     });
 
     await user.click(wishlistButton);
