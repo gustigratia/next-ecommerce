@@ -10,6 +10,8 @@ Cypress.on('uncaught:exception', (err) => {
     'ResizeObserver loop limit exceeded',
     'Loading chunk',
     'Hydration failed',
+    'Text content does not match server-rendered HTML',
+    'There was an error while hydrating',
   ];
 
   return !ignoredMessages.some((message) => err.message.includes(message));

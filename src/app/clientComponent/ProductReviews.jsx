@@ -175,7 +175,7 @@ const ProductReviews = ({ productId, initialReviews = [], initialRating = 0 }) =
 
               {review.createdAt && (
                 <p className="mt-2 text-xs text-gray-400">
-                  {new Date(review.createdAt).toLocaleDateString()}
+                  {new Date(review.createdAt).toISOString().slice(0, 10)}
                 </p>
               )}
             </div>

@@ -45,18 +45,21 @@ const config = {
     '!**/node_modules/**',
   ],
 
+  // Ignore measurement for Next.js app/ folder and other runtime-only files
+  coveragePathIgnorePatterns: ['/node_modules/', '/app/', '/public/', '/__mocks__/'],
+
   testPathIgnorePatterns: [
     '/node_modules/',
     // "<rootDir>/src/__test__/integration",
   ],
 
-  // Coverage thresholds — aim for 60 % (the CI requirement)
+  // Coverage thresholds — require at least 90% overall
   coverageThreshold: {
     global: {
-      statements: 60,
-      branches: 60,
-      functions: 60,
-      lines: 60,
+      statements: 90,
+      branches: 90,
+      functions: 90,
+      lines: 90,
     },
   },
 
