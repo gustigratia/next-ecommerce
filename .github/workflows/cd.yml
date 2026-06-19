@@ -81,7 +81,7 @@ jobs:
           flags: --allow-unauthenticated
           env_vars: |-
             NODE_ENV=staging
-            NEXT_PUBLIC_SITE_URL=${{ secrets.NEXT_PUBLIC_SITE_URL_STAGING }}
+            NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL_STAGING }}
             DB_URI=${{ secrets.DB_URI_STAGING }}
             DB_URI_STAGING=${{ secrets.DB_URI_STAGING }}
             FIREBASE_ADMIN_PROJECT_ID=${{ secrets.FIREBASE_ADMIN_PROJECT_ID }}
@@ -203,7 +203,7 @@ jobs:
           flags: --allow-unauthenticated
           env_vars: |-
             NODE_ENV=production
-            NEXT_PUBLIC_SITE_URL=${{ secrets.NEXT_PUBLIC_SITE_URL_PRODUCTION }}
+            NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL_PRODUCTION }}
             DB_URI=${{ secrets.DB_URI }}
             FIREBASE_ADMIN_PROJECT_ID=${{ secrets.FIREBASE_ADMIN_PROJECT_ID }}
             FIREBASE_ADMIN_CLIENT_EMAIL=${{ secrets.FIREBASE_ADMIN_CLIENT_EMAIL }}
