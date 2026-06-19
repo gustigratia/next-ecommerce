@@ -7,7 +7,11 @@ import SingleProductDetail from '@/app/clientComponent/SingleProductDetail';
 export const dynamic = 'force-dynamic';
 
 const SingleProduct = async ({ params }) => {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    'http://localhost:3000' ||
+    'https://next-ecommerce-n4u6ont3rq-et.a.run.app' ||
+    'https://next-ecommerce-staging-n4u6ont3rq-et.a.run.app';
 
   const { data } = await axios.get(`${baseUrl}/api/product/${params.singleProductId}`);
   const productData = await axios.get(`${baseUrl}/api/product`);
