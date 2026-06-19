@@ -69,12 +69,6 @@ jobs:
       - name: Run Jest tests with coverage
         run: npm run test:ci
 
-      - name: Upload coverage to Qlty
-        uses: qltysh/qlty-action/coverage@v2
-        with:
-          token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
-          files: coverage/lcov.info
-
   build:
     name: Build Next.js App
     runs-on: ubuntu-latest
